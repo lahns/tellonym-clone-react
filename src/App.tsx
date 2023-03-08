@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Navbar from './Navbar';
+import { Question } from './Question';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         >
           Learn React
         </a>
+        <Question question='Bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla, bla bla bla?' answer='mhm, śmiga ziomek'></Question>
       </header>
     </div>
     </>
