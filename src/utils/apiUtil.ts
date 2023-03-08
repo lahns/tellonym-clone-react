@@ -1,5 +1,5 @@
 import { AccessToken, AnswerData, AskData, LoginData, VoteData } from "../types";
-import config from './config';
+import config from "./config";
 
 type JSONBody = {
     data: LoginData | AskData | AnswerData | VoteData,
@@ -11,6 +11,10 @@ type FormBody = {
     __type: "form",
 };
 
+const isJSON = (x: JSONBody | FormBody): x is JSONBody => {
+    return x.__type === "json";
+} 
+
 //Doesnt try to refresh token after an unauthorized request
 const fetchApiRaw = async (
     route: string, 
@@ -18,19 +22,17 @@ const fetchApiRaw = async (
     body: JSONBody | FormBody | null = null,
     access_token: AccessToken | null = null,
 ): Promise<Response> => fetch(`${config.ServerURL}${route}`, {
-    ...(body && { 
-        body: body.__type === "json" ? 
-            JSON.stringify(body.data)
-            : body.data 
-        }),
-    headers: {
-        "Bypass-Tunnel-Reminder": "true",
-        ...(body && body.__type === "json" && { "Content-Type": "application/json" }),
-        ...(access_token && { "Authorization": `Bearer: ${access_token.token}` }),
-    },
-    credentials: "include",
-    method: method,
-});
+        ...(body && isJSON(body) && { body: JSON.stringify(body.data) }),
+        ...(body && !isJSON(body) && { body: body.data }),
+        headers: {
+            "Bypass-Tunnel-Reminder": "true",
+            ...(body && isJSON(body) && { "Content-Type": "application/json" }),
+            ...(access_token && { "Authorization": `Bearer: ${access_token.token}` }),
+        },
+        credentials: "include",
+        method: method,
+    })
+
 
 export const fetchApi = async (
     route: string,
@@ -59,9 +61,10 @@ export const apiEditProfile = async (token: AccessToken, form_data: FormData) =>
     await fetchApi(
         "/editprofile",
         "POST",
-        { data: form_data } as FormBody,
+        { data: form_data, __type: "form" } as FormBody,
         token
-    );
+    )
+    .catch(console.error)
 }
 
 export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
@@ -69,7 +72,7 @@ export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
     await fetchApi(
         "/login", 
         "POST", 
-        { data: userData } as JSONBody,
+        { data: userData, __type: "json" } as JSONBody,
         token,
     )
     .then(res => res.text())
@@ -83,7 +86,7 @@ export const apiRegisterUser = async (userData: LoginData, token: AccessToken) =
     await fetchApi(
         "/register", 
         "POST", 
-        { data: userData } as JSONBody,
+        { data: userData, __type: "json" } as JSONBody,
     )
     .then(res => res.text())
     .then(res => token.token = res)
@@ -106,7 +109,7 @@ export const apiAskQuestion = async ( question: AskData, user_id: number, token:
     await fetchApi(
         `/users/${user_id}/ask`,
         "POST",
-        { data: question } as JSONBody,
+        { data: question, __type: "json" } as JSONBody,
         token,
     )
     .catch(console.error);
@@ -125,7 +128,7 @@ export const apiAnswerQuestion = async (question_id: number, token: AccessToken,
     await fetchApi(
         `/questions/${question_id}/answer`,
         "POST",
-        { data: answer } as JSONBody,
+        { data: answer, __type: "json" } as JSONBody,
         token,
     )
     .then(res => res.json())
