@@ -3,7 +3,7 @@ import React from 'react';
 export function Question(props: any) {
     return (
         <>
-            <div className='QuestionContainer bg-slate-900 text-xl w-1/3 text-left p-5'>
+            <div className='QuestionContainer bg-slate-900 text-xl w-11/12 max-w-lg text-left p-5'>
                 <div className='Question'>
                     {props.question}
                 </div>
