@@ -1,4 +1,4 @@
-import { AccessToken, AnswerData, AskData, LoginData, VoteData } from "../types";
+import { AccessToken, AnswerData, AskData, LoginData, QuestionWithAnswer, User, VoteData } from "../types";
 import config from "./config";
 
 type JSONBody = {
@@ -115,13 +115,13 @@ export const apiAskQuestion = async ( question: AskData, user_id: number, token:
     .catch(console.error);
 }
 
-export const apiGetUserQuestions = async (user_id: number) => {
+export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWithAnswer[]> => {
     return await fetchApi(
         `/users/${user_id}/questions`,
         "GET",
     )
     .then(res => res.json())
-    .catch(console.error);
+    .catch(console.error) as QuestionWithAnswer[];
 }
 
 export const apiAnswerQuestion = async (question_id: number, token: AccessToken, answer: AnswerData) =>{
@@ -135,13 +135,13 @@ export const apiAnswerQuestion = async (question_id: number, token: AccessToken,
     .catch(console.error);
 }
 
-export const apiUser = async (id: number) => {    
+export const apiUser = async (id: number): Promise<User> => {    
     return await fetchApi(
         `/users/${id}`,
         "GET",
     )
     .then(res => res.json())
-    .catch(console.error);        
+    .catch(console.error) as User;        
 }
 
 //Add like/dislike api helpers
