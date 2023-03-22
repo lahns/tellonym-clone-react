@@ -90,7 +90,7 @@ export const apiRegisterUser = async (userData: LoginData, token: AccessToken) =
     )
     .then(res => res.text())
     .then(res => token.token = res)
-    .catch(() => console.error("Problem with registering")) ?? "";
+    .catch(() => console.error("Problem with registering"));
     
     window.location.href = `${window.location.origin}/profile.html`;
 }
