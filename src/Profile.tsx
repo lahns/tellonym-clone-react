@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useLocation } from "wouter";
 import Question from "./Question";
 import { QuestionWithAnswer, User } from "./types";
@@ -6,6 +6,11 @@ import { apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
 
 type ProfileProps = { userId: number };
+
+const askerReducer = ({map}: { map: Map<number, User> }, {id, userData}: { id: number, userData: User }) => {
+    map.set(id, userData);
+    return { map };
+}
 
 const Profile = ({userId}: ProfileProps) => {
     //Needed to refresh the page when url changes
@@ -15,23 +20,31 @@ const Profile = ({userId}: ProfileProps) => {
     const [userData, setUserData] = useState<User | null>(null);
 
     const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
-    const [askers, setAskers] = useState<Map<number, User>>(new Map());
+    const [{map: askerMap}, dispatchAskers] = useReducer(askerReducer, { map: new Map() });
 
     useEffect(() => {
         // Fetch user data for the profile owner
-        apiUser(userId).then((data) =>
-            setUserData(data)
-        ).catch(() => setUserExists(false));
+        apiUser(userId).then((data) => {
+            if (!data) { // User does not exist
+                setUserExists(false);
+            } else {                
+                setUserData(data)
+            }
+        });
 
         // Fetch questions for the profile user
         apiGetUserQuestions(userId).then((data) => {
+            if (!data) return; // User does not exist, dont load the questions
+
             const askerIds = data
                 .filter(data => data.question.asker_id != null)
                 .map(data => data.question.asker_id!);
 
             askerIds.forEach(id => {
                 apiUser(id).then(userData => {
-                    setAskers(map => new Map(map.set(id, userData))); 
+                    if (!userData) return; // User does not exist, just display as anon
+                    
+                    dispatchAskers({ id, userData }); 
                 });
 
             });
@@ -58,7 +71,7 @@ const Profile = ({userId}: ProfileProps) => {
                                 key={index} 
                                 questionWithAnswer={qwa} 
                                 asker={
-                                    qwa.question.asker_id ? askers.get(qwa.question.asker_id) ?? null : null
+                                    qwa.question.asker_id ? askerMap.get(qwa.question.asker_id) ?? null : null
                             }/>
                         )}
                     </div>

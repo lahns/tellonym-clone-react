@@ -114,30 +114,41 @@ export const apiAskQuestion = async ( question: AskData, user_id: number, token:
     );
 }
 
-export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWithAnswer[]> => {
+export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWithAnswer[] | null> => {
     return await fetchApi(
         `/users/${user_id}/questions`,
         "GET",
     )
-    .then(res => res.json()) as QuestionWithAnswer[];
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return null;
+        }
+    }) as QuestionWithAnswer[] | null;
 }
 
-export const apiAnswerQuestion = async (question_id: number, token: AccessToken, answer: AnswerData) =>{
+export const apiAnswerQuestion = async (question_id: number, token: AccessToken, answer: AnswerData) => {
     await fetchApi(
         `/questions/${question_id}/answer`,
         "POST",
         { data: answer, __type: "json" } as JSONBody,
         token,
     )
-    .then(res => res.json());
 }
 
-export const apiUser = async (id: number): Promise<User> => {    
+export const apiUser = async (id: number): Promise<User | null> => {    
     return await fetchApi(
         `/users/${id}`,
         "GET",
     )
-    .then(res => res.json()) as User;        
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return null;
+        }
+    }) as User | null;        
 }
 
 //Add like/dislike api helpers
