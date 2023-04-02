@@ -7,10 +7,11 @@ import config from "./utils/config";
 
 type ProfileProps = { userId: number };
 
-export default ({userId}: ProfileProps) => {
+const Profile = ({userId}: ProfileProps) => {
     //Needed to refresh the page when url changes
-    const [location, ] = useLocation();
+    const [location,] = useLocation();
 
+    const [userExists, setUserExists] = useState<boolean>(true);
     const [userData, setUserData] = useState<User | null>(null);
 
     const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
@@ -20,7 +21,7 @@ export default ({userId}: ProfileProps) => {
         // Fetch user data for the profile owner
         apiUser(userId).then((data) =>
             setUserData(data)
-        );
+        ).catch(() => setUserExists(false));
 
         // Fetch questions for the profile user
         apiGetUserQuestions(userId).then((data) => {
@@ -37,31 +38,35 @@ export default ({userId}: ProfileProps) => {
             
             setQuestions(data);
         });
-    }, [location]);
+    }, [location, userId]);
 
     return (
-        <div>{userData ? 
-            <> 
-                <div>
-                    <img className="rounded-full w-96 h-96" alt="" src={`${config.ServerURL}/pfps/${userData.id}.png`}></img>
-                    <p>{userData.username}</p>
-                    <p>Followers: {userData.follower_count}</p>
-                    <p>Following: {userData.following_count}</p>
-                    {userData.bio !== "" ? <p>Bio: {userData.bio}</p> : null}
-                </div>
-                <div>
-                    <h1 className="text-xl"> PYTANIA: </h1>
-                    {questions.map((qwa, index) =>
-                        <Question 
-                            key={index} 
-                            questionWithAnswer={qwa} 
-                            asker={
-                                qwa.question.asker_id ? askers.get(qwa.question.asker_id) ?? null : null
-                        }/>
-                    )}
-                </div>
-            </>
-        : "Loading..."}
+        <div>{userExists ?
+            userData ?  
+                <> 
+                    <div>
+                        <img className="rounded-full w-96 h-96" alt="" src={`${config.ServerURL}/pfps/${userData.id}.png`}></img>
+                        <p>{userData.username}</p>
+                        <p>Followers: {userData.follower_count}</p>
+                        <p>Following: {userData.following_count}</p>
+                        {userData.bio !== "" ? <p>Bio: {userData.bio}</p> : null}
+                    </div>
+                    <div>
+                        <h1 className="text-xl"> PYTANIA: </h1>
+                        {questions.map((qwa, index) =>
+                            <Question 
+                                key={index} 
+                                questionWithAnswer={qwa} 
+                                asker={
+                                    qwa.question.asker_id ? askers.get(qwa.question.asker_id) ?? null : null
+                            }/>
+                        )}
+                    </div>
+                </>
+            : "Loading..."
+        : "User not found"}
         </div>
     );
 }
+
+export default Profile;

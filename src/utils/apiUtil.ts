@@ -42,10 +42,10 @@ export const fetchApi = async (
 ): Promise<Response> => {
     let result = await fetchApiRaw(route, method, json, access_token);
 
-    if (result.status == 401 && access_token) {
+    if (result.status === 401 && access_token) {
         let refresh_res = await fetchApiRaw("/refresh", "POST");
 
-        if (refresh_res.status == 401) {
+        if (refresh_res.status === 401) {
             return new Promise((_, rej) => rej("Not logged in"));
         }
 
@@ -64,7 +64,6 @@ export const apiEditProfile = async (token: AccessToken, form_data: FormData) =>
         { data: form_data, __type: "form" } as FormBody,
         token
     )
-    .catch(console.error)
 }
 
 export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
@@ -79,6 +78,7 @@ export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
     .then(res => token.token = res)
     .catch(() => console.error("Problem with logging in"));
     
+    // TODO: use wouter to redirect
     window.location.href = `${window.location.origin}/profile.html`;
 }
 
@@ -92,6 +92,7 @@ export const apiRegisterUser = async (userData: LoginData, token: AccessToken) =
     .then(res => token.token = res)
     .catch(() => console.error("Problem with registering"));
     
+    // TODO: use wouter to redirect
     window.location.href = `${window.location.origin}/profile.html`;
 }
 
@@ -101,8 +102,7 @@ export const apiFollow = async (user_id: number, token: AccessToken) => {
         "POST",
         null,
         token,
-    )
-    .catch(console.error);
+    );
 }
 
 export const apiAskQuestion = async ( question: AskData, user_id: number, token: AccessToken) => {
@@ -111,8 +111,7 @@ export const apiAskQuestion = async ( question: AskData, user_id: number, token:
         "POST",
         { data: question, __type: "json" } as JSONBody,
         token,
-    )
-    .catch(console.error);
+    );
 }
 
 export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWithAnswer[]> => {
@@ -120,8 +119,7 @@ export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWith
         `/users/${user_id}/questions`,
         "GET",
     )
-    .then(res => res.json())
-    .catch(console.error) as QuestionWithAnswer[];
+    .then(res => res.json()) as QuestionWithAnswer[];
 }
 
 export const apiAnswerQuestion = async (question_id: number, token: AccessToken, answer: AnswerData) =>{
@@ -131,8 +129,7 @@ export const apiAnswerQuestion = async (question_id: number, token: AccessToken,
         { data: answer, __type: "json" } as JSONBody,
         token,
     )
-    .then(res => res.json())
-    .catch(console.error);
+    .then(res => res.json());
 }
 
 export const apiUser = async (id: number): Promise<User> => {    
@@ -140,8 +137,7 @@ export const apiUser = async (id: number): Promise<User> => {
         `/users/${id}`,
         "GET",
     )
-    .then(res => res.json())
-    .catch(console.error) as User;        
+    .then(res => res.json()) as User;        
 }
 
 //Add like/dislike api helpers
