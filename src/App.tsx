@@ -3,6 +3,7 @@ import './App.css';
 import Navbar from './Navbar';
 import Profile from './Profile';
 import logo from './logo.svg';
+import Login from './Login';
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
             return <Profile userId={user}></Profile>
           } 
         }
+      </Route>
+      <Route path="/login">
+         <Login></Login>
       </Route>
       <Route>
         404
