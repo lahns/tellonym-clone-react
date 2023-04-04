@@ -1,4 +1,4 @@
-import { AccessToken, AnswerData, AskData, LoginData, QuestionWithAnswer, User, VoteData } from "../types";
+import { AccessToken, AnswerData, AskData, LoginData, QuestionWithAnswer, User, UserWithLikes, VoteData } from "../types";
 import config from "./config";
 
 type JSONBody = {
@@ -64,6 +64,21 @@ export const apiEditProfile = async (token: AccessToken, form_data: FormData) =>
         { data: form_data, __type: "form" } as FormBody,
         token
     )
+}
+
+export const apiMe = async (token: AccessToken) => {
+    await fetchApi(
+        "/me",
+        "GET",
+        null,
+        token
+    ).then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return null;
+        }
+    }) as UserWithLikes | null;  
 }
 
 export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
