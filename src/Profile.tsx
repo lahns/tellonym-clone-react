@@ -1,9 +1,10 @@
-import { useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import { useLocation } from "wouter";
 import Question from "./Question";
 import { QuestionWithAnswer, User } from "./types";
 import { apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
+import AppContext from "./context";
 
 type ProfileProps = { userId: number };
 
@@ -21,6 +22,10 @@ const Profile = ({userId}: ProfileProps) => {
 
     const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
     const [{map: askerMap}, dispatchAskers] = useReducer(askerReducer, { map: new Map() });
+
+    // const context = useContext(AppContext);
+    // const userLikes = context.currentUser?.likes;
+
 
     useEffect(() => {
         // Fetch user data for the profile owner
