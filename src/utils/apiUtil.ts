@@ -66,8 +66,8 @@ export const apiEditProfile = async (token: AccessToken, form_data: FormData) =>
     )
 }
 
-export const apiMe = async (token: AccessToken) => {
-    await fetchApi(
+export const apiMe = async (token: AccessToken): Promise<UserWithLikes | null> => {
+    return await fetchApi(
         "/me",
         "GET",
         null,
