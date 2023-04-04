@@ -77,9 +77,6 @@ export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
     .then(res => res.text())
     .then(res => token.token = res)
     .catch(() => console.error("Problem with logging in"));
-    
-    // TODO: use wouter to redirect
-    window.location.href = `${window.location.origin}/profile.html`;
 }
 
 export const apiRegisterUser = async (userData: LoginData, token: AccessToken) => {
@@ -91,9 +88,6 @@ export const apiRegisterUser = async (userData: LoginData, token: AccessToken) =
     .then(res => res.text())
     .then(res => token.token = res)
     .catch(() => console.error("Problem with registering"));
-    
-    // TODO: use wouter to redirect
-    window.location.href = `${window.location.origin}/profile.html`;
 }
 
 export const apiFollow = async (user_id: number, token: AccessToken) => {
