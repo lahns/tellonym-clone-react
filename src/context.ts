@@ -1,4 +1,4 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 import { AccessToken, UserWithLikes } from './types';
 
 export type SessionData = {
@@ -13,3 +13,8 @@ export const AppContext = createContext<{ context: SessionData, setContext: (new
     },
     setContext: () => {}
 });
+
+export const useAppContext = (): { 
+    context: SessionData, 
+    setContext: (newData: SessionData) => void 
+} => useContext(AppContext);

@@ -1,12 +1,11 @@
-import { useContext } from "react";
 import { Link } from "wouter";
-import { AppContext } from "./context";
+import { useAppContext } from "./context";
 import { ReactComponent as HomeIcon } from "./icons/home_icon.svg";
 import { ReactComponent as SearchIcon } from "./icons/search_icon.svg";
 import config from "./utils/config";
 
 export default function Navbar(){
-    const { context } = useContext(AppContext);
+    const { context } = useAppContext();
     const userId = context.currentUser?.user.id;
 
     return(

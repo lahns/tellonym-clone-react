@@ -1,6 +1,5 @@
 import { Field, Form, Formik, FormikHelpers } from 'formik';
-import { useContext } from 'react';
-import { AppContext } from './context';
+import { useAppContext } from './context';
 import { apiLogIn, apiMe } from './utils/apiUtil';
 
 const lenFieldValidator = (len: number, err: string): (value: any) => any => {
@@ -21,7 +20,30 @@ type Values = {
 }
 
 function Login() {
-    const { context, setContext } = useContext(AppContext);
+    const { context, setContext } = useAppContext();
+
+    const submitLogin = (
+      { login: username, password }: Values,
+      { setSubmitting, setErrors }: FormikHelpers<Values>
+    ) => {
+      apiLogIn({username, password})
+      .then(token => {
+          apiMe(token)
+          .then(user => {
+              if (!user) {
+                setErrors({ servererr: "User not found" });
+                return;
+              }
+              setContext({...context, accessToken: token, currentUser: user })
+            });
+        }).catch(err => {
+          if (err instanceof Error) {
+            setErrors({ servererr: err.message });
+          }
+        });
+      
+      setSubmitting(false);
+    };
 
     return (<>
     <div>
@@ -31,25 +53,7 @@ function Login() {
           login: '',
           password: '',
         }}
-        onSubmit={(
-          { login: username, password }: Values,
-          { setSubmitting, setErrors }: FormikHelpers<Values>
-        ) => {        
-          apiLogIn({username, password})
-            .then(token => {
-                apiMe(token)
-                .then(user => {
-                    if (!user) return;
-                    setContext({...context, accessToken: token, currentUser: user })
-                  });
-              }).catch(err => {
-                if (err instanceof Error) {
-                  setErrors({ servererr: err.message });
-                }
-              });
-            
-            setSubmitting(false);
-        }}
+        onSubmit={submitLogin}
       >
         {({errors, isSubmitting}) =>
           <Form>

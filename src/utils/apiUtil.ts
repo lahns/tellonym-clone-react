@@ -82,7 +82,6 @@ export const apiMe = async (token: AccessToken): Promise<UserWithLikes | null> =
 }
 
 export const apiLogIn = async (userData: LoginData): Promise<AccessToken> => {
-    //login user example
     return await fetchApi(
         "/login", 
         "POST", 
@@ -98,8 +97,8 @@ export const apiLogIn = async (userData: LoginData): Promise<AccessToken> => {
     });
 }
 
-export const apiRegisterUser = async (userData: LoginData, token: AccessToken) => {
-    await fetchApi(
+export const apiRegisterUser = async (userData: LoginData): Promise<AccessToken> => {
+    return await fetchApi(
         "/register", 
         "POST", 
         { data: userData, __type: "json" } as JSONBody,

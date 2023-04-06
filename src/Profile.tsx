@@ -22,10 +22,6 @@ const Profile = ({userId}: ProfileProps) => {
     const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
     const [{map: askerMap}, dispatchAskers] = useReducer(askerReducer, { map: new Map() });
 
-    // const context = useContext(AppContext);
-    // const userLikes = context.currentUser?.likes;
-
-
     useEffect(() => {
         // Fetch user data for the profile owner
         apiUser(userId).then((data) => {
