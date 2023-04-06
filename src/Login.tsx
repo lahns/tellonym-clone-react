@@ -1,40 +1,81 @@
-import React from "react";
-import * as ReactDOM from 'react-dom';
-import { Formik, Field, Form, FormikHelpers } from 'formik';
+import { Field, Form, Formik, FormikHelpers } from 'formik';
+import { useContext } from 'react';
+import { AppContext } from './context';
+import { apiLogIn, apiMe } from './utils/apiUtil';
+
+const lenFieldValidator = (len: number, err: string): (value: any) => any => {
+  return (value) => {
+    if (value && typeof value === "string") {
+      if (value.length < len) {
+        return err;
+      }
+    }
+    return;
+  }
+}
+
+type Values = {
+  login: string;
+  password: string;
+  servererr?: string;
+}
 
 function Login() {
-
-    interface Values {
-        login: string;
-        password: string;
-      }
+    const { context, setContext } = useContext(AppContext);
 
     return (<>
     <div>
       <h1>Log into your account</h1>
-      <Formik
+      <Formik 
         initialValues={{
           login: '',
           password: '',
         }}
         onSubmit={(
-          values: Values,
-          { setSubmitting }: FormikHelpers<Values>
-        ) => {
-        
-            alert(JSON.stringify(values, null, 2));
+          { login: username, password }: Values,
+          { setSubmitting, setErrors }: FormikHelpers<Values>
+        ) => {        
+          apiLogIn({username, password})
+            .then(token => {
+                apiMe(token)
+                .then(user => {
+                    if (!user) return;
+                    setContext({...context, accessToken: token, currentUser: user })
+                  });
+              }).catch(err => {
+                if (err instanceof Error) {
+                  setErrors({ servererr: err.message });
+                }
+              });
+            
             setSubmitting(false);
         }}
       >
-        <Form>
-          <label htmlFor="login">Login:</label>
-          <Field id="login" name="login" placeholder="Your login" />
+        {({errors, isSubmitting}) =>
+          <Form>
+            <label htmlFor="login">Login:</label>
+            <Field 
+              validate={lenFieldValidator(3, "The username must be at least 8 characters long")}
+              id="login" 
+              name="login" 
+              placeholder="Your login" 
+            />
+            {errors.login && <div>{errors.login}</div>}
 
-          <label htmlFor="password">Password:</label>
-          <Field id="password" name="password" placeholder="Your password" type="password"/>
+            <label htmlFor="password">Password:</label>
+            <Field 
+              validate={lenFieldValidator(8, "The password must be at least 8 characters long")} 
+              id="password" 
+              name="password" 
+              placeholder="Your password" 
+              type="password"
+            />
+            {errors.password && <div>{errors.password}</div>}
+            <button type="submit" disabled={isSubmitting}>Submit</button>
+            {errors.servererr && <div>{errors.servererr}</div>}
 
-          <button type="submit">Submit</button>
-        </Form>
+          </Form>
+        }
       </Formik>
     </div>
 

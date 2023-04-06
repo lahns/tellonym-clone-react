@@ -1,16 +1,15 @@
 import { createContext } from 'react';
 import { AccessToken, UserWithLikes } from './types';
 
-type SessionData = {
+export type SessionData = {
     accessToken: AccessToken,
     currentUser: UserWithLikes | null,
 };
 
-const AppContext = createContext<SessionData>(
-    {
+export const AppContext = createContext<{ context: SessionData, setContext: (newData: SessionData) => void}>({
+    context: {
         accessToken: { token: "", _marker: null },
         currentUser: null
-    }
-);
-
-export default AppContext;
+    },
+    setContext: () => {}
+});

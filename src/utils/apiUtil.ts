@@ -81,17 +81,21 @@ export const apiMe = async (token: AccessToken): Promise<UserWithLikes | null> =
     }) as UserWithLikes | null;  
 }
 
-export const apiLogIn = async (userData: LoginData, token: AccessToken) => {
+export const apiLogIn = async (userData: LoginData): Promise<AccessToken> => {
     //login user example
-    await fetchApi(
+    return await fetchApi(
         "/login", 
         "POST", 
         { data: userData, __type: "json" } as JSONBody,
-        token,
-    )
-    .then(res => res.text())
-    .then(res => token.token = res)
-    .catch(() => console.error("Problem with logging in"));
+    ).then(res => {
+        return res.text().then(resText => {
+            if (res.ok) {
+                return { token: resText, _marker: null } ;
+            } else {
+                throw new Error(resText);
+            }
+        });
+    });
 }
 
 export const apiRegisterUser = async (userData: LoginData, token: AccessToken) => {
@@ -99,10 +103,15 @@ export const apiRegisterUser = async (userData: LoginData, token: AccessToken) =
         "/register", 
         "POST", 
         { data: userData, __type: "json" } as JSONBody,
-    )
-    .then(res => res.text())
-    .then(res => token.token = res)
-    .catch(() => console.error("Problem with registering"));
+    ).then(res => {
+        return res.text().then(resText => {
+            if (res.ok) {
+                return { token: resText, _marker: null } ;
+            } else {
+                throw new Error(resText);
+            }
+        });
+    });
 }
 
 export const apiFollow = async (user_id: number, token: AccessToken) => {

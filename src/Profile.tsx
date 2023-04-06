@@ -1,10 +1,9 @@
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useLocation } from "wouter";
 import Question from "./Question";
 import { QuestionWithAnswer, User } from "./types";
 import { apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
-import AppContext from "./context";
 
 type ProfileProps = { userId: number };
 

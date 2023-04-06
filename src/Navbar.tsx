@@ -1,28 +1,15 @@
+import { useContext } from "react";
 import { Link } from "wouter";
-import { ReactComponent as AccountIcon } from "./icons/account_icon.svg";
+import { AppContext } from "./context";
 import { ReactComponent as HomeIcon } from "./icons/home_icon.svg";
 import { ReactComponent as SearchIcon } from "./icons/search_icon.svg";
-import { useContext, useEffect, useState } from "react";
-import AppContext from "./context";
-import { apiLogIn, apiMe } from "./utils/apiUtil";
 import config from "./utils/config";
 
 export default function Navbar(){
-    const app = useContext(AppContext);
-    const [userId, setUserId] = useState<number | null>(null);
-    useEffect(() => {
-        apiLogIn({ username: "elonator", password: "Elonator123"}, app.accessToken);
-        apiMe(app.accessToken)
-            .then(user => {
-                if (!user) return;
-                app.currentUser = user;
-                setUserId(app.currentUser?.user.id ?? null);
-            });
-    });
+    const { context } = useContext(AppContext);
+    const userId = context.currentUser?.user.id;
+
     return(
-
-
-        
         <>
         <nav className="flex justify-center items-center gap-16 pt-2 pb-2 bg-white drop-shadow-lg">
             <Link to="/home"><HomeIcon className="scale-10 h-10"/></Link>
