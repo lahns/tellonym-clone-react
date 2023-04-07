@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FocusEvent, useState } from "react";
 import { Link } from "wouter";
 import { useAppContext } from "./context";
 import { ReactComponent as HomeIcon } from "./icons/home_icon.svg";
@@ -12,13 +12,20 @@ export default function Navbar(){
 
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
+
     const logOut = () => {
         apiLogOut()
             .then(() => {
                 setContext({ ...context, accessToken: null, currentUser: null })
                 setDropdownOpen(false);
             })
-            .catch(() => { /* show some error message */});
+            .catch(() => { /* server error */});
+    };
+
+    const closeDropdownBlur = (event: FocusEvent<HTMLDivElement, Element>) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+            setDropdownOpen(false);
+        }
     };
 
     return(
@@ -28,7 +35,7 @@ export default function Navbar(){
             <Link to="/search"><SearchIcon className="scale-10 h-10"/></Link>
 
             { userId ? 
-                <div className="flex flex-col">
+                <div tabIndex={0} onBlur={closeDropdownBlur} className="flex flex-col">
                     <button className="flex flex-row justify-center items-center gap-2" onClick={() => setDropdownOpen(!dropdownOpen)}>
                         <div>{context.currentUser!.user.username}</div>
                         <img src={`${config.ServerURL}/pfps/${userId}.png`} className="scale-10 h-10"/>
@@ -36,12 +43,12 @@ export default function Navbar(){
                     { dropdownOpen && 
                         <div className="rounded-lg overflow-hidden flex flex-col absolute -ml-5 top-14 bg-white drop-shadow-lg justify-start w-28 divide-y divide-gray-200">
                             <div className="flex flex-col">
-                                <Link className="p-4 hover:bg-blue-100" to={`/user/${userId}`}>Profile</Link>
-                                <Link className="p-4 hover:bg-blue-100" to={`/settings`}>Settings</Link>
+                                <Link onClick={() => setDropdownOpen(false)} className="inline-block p-4 hover:bg-blue-100" to={`/user/${userId}`}>Profile</Link>
+                                <Link onClick={() => setDropdownOpen(false)} className="inline-block p-4 hover:bg-blue-100" to={`/settings`}>Settings</Link>
                             </div>
-                            <button className="text-left p-4 text-red-400 hover:text-white hover:bg-red-300" onClick={logOut}>Log out</button>
+                            <button className="inline-block text-left p-4 text-red-400 hover:text-white hover:bg-red-300" onClick={logOut}>Log out</button>
                         </div>
-                    }              
+                    }
                 </div>
                 :
                 <Link to={`/login`}>

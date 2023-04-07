@@ -33,17 +33,19 @@ function Login() {
             apiMe({ 
               context: {...context, accessToken: token}, 
               setContext 
-            })
-              .then(user => {
-                  if (!user) {
-                    setErrors({ servererr: "User not found" });
-                    return;
-                  }
-                  setContext({...context, accessToken: token, currentUser: user });
-                  setLocation(`/home`);
-                });
-          })
-          .catch(err => {
+            }).then(user => {
+              if (!user) {
+                setErrors({ servererr: "User not found" });
+                return;
+              }
+              setContext({...context, accessToken: token, currentUser: user });
+              setLocation(`/home`);
+            }).catch(err => {
+              if (err instanceof Error) {
+                setErrors({ servererr: err.message });
+              }
+            });
+          }).catch(err => {
             if (err instanceof Error) {
               setErrors({ servererr: err.message });
             }

@@ -18,7 +18,7 @@ function App() {
   )
 
   useEffect(() => {
-    //Try to log in user automatically
+    //Try to log in the user automatically
     apiRefresh()
       .then(token => {
         if (!token) {
