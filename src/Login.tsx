@@ -1,4 +1,5 @@
 import { Field, Form, Formik, FormikHelpers } from 'formik';
+import { useLocation } from 'wouter';
 import { useAppContext } from './context';
 import { apiLogIn, apiMe } from './utils/apiUtil';
 
@@ -21,27 +22,33 @@ type Values = {
 
 function Login() {
     const { context, setContext } = useAppContext();
+    const [ location, setLocation ] = useLocation();
 
     const submitLogin = (
       { login: username, password }: Values,
       { setSubmitting, setErrors }: FormikHelpers<Values>
     ) => {
       apiLogIn({username, password})
-      .then(token => {
-          apiMe(token)
-          .then(user => {
-              if (!user) {
-                setErrors({ servererr: "User not found" });
-                return;
-              }
-              setContext({...context, accessToken: token, currentUser: user })
-            });
-        }).catch(err => {
-          if (err instanceof Error) {
-            setErrors({ servererr: err.message });
-          }
-        });
-      
+        .then(token => {
+            apiMe({ 
+              context: {...context, accessToken: token}, 
+              setContext 
+            })
+              .then(user => {
+                  if (!user) {
+                    setErrors({ servererr: "User not found" });
+                    return;
+                  }
+                  setContext({...context, accessToken: token, currentUser: user });
+                  setLocation(`/home`);
+                });
+          })
+          .catch(err => {
+            if (err instanceof Error) {
+              setErrors({ servererr: err.message });
+            }
+          });
+        
       setSubmitting(false);
     };
 

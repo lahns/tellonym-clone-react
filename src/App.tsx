@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Switch } from 'wouter';
 import './App.css';
 import Login from './Login';
@@ -6,15 +6,40 @@ import Navbar from './Navbar';
 import Profile from './Profile';
 import { AppContext, SessionData } from './context';
 import logo from './logo.svg';
+import { apiMe, apiRefresh } from './utils/apiUtil';
 
 
 function App() {
   const [context, setContext] = useState<SessionData>(
     {
-      accessToken: { token: "", _marker: null },
+      accessToken: null,
       currentUser: null
     }
   )
+
+  useEffect(() => {
+    //Try to log in user automatically
+    apiRefresh()
+      .then(token => {
+        if (!token) {
+          //not logged in, 
+          return;
+        }
+        apiMe({ 
+          context: {...context, accessToken: token}, 
+          setContext 
+        })
+          .then(user => {
+            if (!user) {
+              //user does not exist
+              return;
+            }
+
+            setContext({...context, accessToken: token, currentUser: user});
+          })
+      })  
+    .catch(() => { /* server error */ });
+  }, []);
 
   return (
     <AppContext.Provider value={{context, setContext}}>

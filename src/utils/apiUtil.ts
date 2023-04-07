@@ -1,3 +1,4 @@
+import { useAppContext } from "../context";
 import { AccessToken, AnswerData, AskData, LoginData, QuestionWithAnswer, User, UserWithLikes, VoteData } from "../types";
 import config from "./config";
 
@@ -38,40 +39,54 @@ export const fetchApi = async (
     route: string,
     method: "POST" | "GET",
     json: JSONBody | FormBody | null = null,
-    access_token: AccessToken | null = null,
+    context: ReturnType<typeof useAppContext> | null = null
 ): Promise<Response> => {
-    let result = await fetchApiRaw(route, method, json, access_token);
+    let result = await fetchApiRaw(route, method, json, context?.context.accessToken);
 
-    if (result.status === 401 && access_token) {
-        let refresh_res = await fetchApiRaw("/refresh", "POST");
+    if (result.status === 401 && context?.context.accessToken) {
 
-        if (refresh_res.status === 401) {
-            return new Promise((_, rej) => rej("Not logged in"));
-        }
+        return await apiRefresh()
+            .then(token => {
+                if (!token) {
+                    throw new Error("not logged in");
+                }
 
-        access_token.token = await refresh_res.text();
-
-        return await fetchApiRaw(route, method, json, access_token);
+                context.setContext({...context.context, accessToken: token});
+                return fetchApiRaw(route, method, json, token);
+            });
     }
 
     return result;
 }
 
-export const apiEditProfile = async (token: AccessToken, form_data: FormData) => {
+export const apiRefresh = async (): Promise<AccessToken | null> => {
+    return await fetchApiRaw("/refresh", "POST")
+        .then(res => {
+            return res.text().then(resText => {
+                if (res.status === 401) {
+                    return null;
+                } else {
+                    return { token: resText, _marker: null };
+                }            
+            });
+        });
+}
+
+export const apiEditProfile = async (form_data: FormData, context: ReturnType<typeof useAppContext>) => {
     await fetchApi(
         "/editprofile",
         "POST",
         { data: form_data, __type: "form" } as FormBody,
-        token
+        context,
     )
 }
 
-export const apiMe = async (token: AccessToken): Promise<UserWithLikes | null> => {
+export const apiMe = async (context: ReturnType<typeof useAppContext>): Promise<UserWithLikes | null> => {
     return await fetchApi(
         "/me",
         "GET",
         null,
-        token
+        context
     ).then(res => {
         if (res.ok) {
             return res.json()
@@ -97,6 +112,13 @@ export const apiLogIn = async (userData: LoginData): Promise<AccessToken> => {
     });
 }
 
+export const apiLogOut = async () => {
+    await fetchApi(
+        "/logout",
+        "POST",
+    );
+}
+
 export const apiRegisterUser = async (userData: LoginData): Promise<AccessToken> => {
     return await fetchApi(
         "/register", 
@@ -113,21 +135,21 @@ export const apiRegisterUser = async (userData: LoginData): Promise<AccessToken>
     });
 }
 
-export const apiFollow = async (user_id: number, token: AccessToken) => {
+export const apiFollow = async (user_id: number, context: ReturnType<typeof useAppContext>) => {
     await fetchApi(
         `/users/${user_id}/follow`,
         "POST",
         null,
-        token,
+        context,
     );
 }
 
-export const apiAskQuestion = async ( question: AskData, user_id: number, token: AccessToken) => {
+export const apiAskQuestion = async ( question: AskData, user_id: number, context: ReturnType<typeof useAppContext>) => {
     await fetchApi(
         `/users/${user_id}/ask`,
         "POST",
         { data: question, __type: "json" } as JSONBody,
-        token,
+        context,
     );
 }
 
@@ -145,12 +167,12 @@ export const apiGetUserQuestions = async (user_id: number): Promise<QuestionWith
     }) as QuestionWithAnswer[] | null;
 }
 
-export const apiAnswerQuestion = async (question_id: number, token: AccessToken, answer: AnswerData) => {
+export const apiAnswerQuestion = async (question_id: number, answer: AnswerData, context: ReturnType<typeof useAppContext>) => {
     await fetchApi(
         `/questions/${question_id}/answer`,
         "POST",
         { data: answer, __type: "json" } as JSONBody,
-        token,
+        context,
     )
 }
 

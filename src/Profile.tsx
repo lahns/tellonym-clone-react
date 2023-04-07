@@ -54,7 +54,7 @@ const Profile = ({userId}: ProfileProps) => {
     }, [location, userId]);
 
     return (
-        <div>{userExists ?
+        <div className="flex flex-col items-center">{userExists ?
             userData ?  
                 <> 
                     <div>
