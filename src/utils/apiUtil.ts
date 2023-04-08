@@ -190,4 +190,19 @@ export const apiUser = async (id: number): Promise<User | null> => {
     }) as User | null;        
 }
 
+
+export const apiSearch = async (query: string): Promise<User[] | null> => {    
+    return await fetchApi(
+        `/users?search=${query}`,
+        "GET",
+    )
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return null;
+        }
+    }) as User[] | null;        
+}
+
 //Add like/dislike api helpers
