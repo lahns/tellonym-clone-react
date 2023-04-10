@@ -95,14 +95,14 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
     return (
         <div tabIndex={0} onBlur={closeSearchBlur} onFocus={openSearchFocus} className="w-1/2 relative justify-center items-center">
             {/* https://stackoverflow.com/questions/60362442/cant-center-absolute-position-tailwind-css */}
-            { !isSearching && 
+            { !isSearching && query === "" && 
                 <div className="pointer-events-none flex flex-row -ml-3 justify-center items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                     <SearchIcon className="fill-gray-400 scale-5 h-5 -mr-3 -mb-1"/>
                     <div className="text-gray-400">Search</div>
                 </div>
             }
             <input ref={inputRef} onChange={onSearchChange} className="w-full p-1 bg-gray-100 border-gray-200 border-2 rounded-lg"></input>
-            { isSearching && 
+            { isSearching &&
                 <div className="bg-white rounded-lg overflow-hidden flex flex-col drop-shadow-lg w-full justify-center items-center absolute left-1/2 transform -translate-x-1/2">
                     {isLoading && 
                         <div className="w-full py-2 text-center text-blue-400">
