@@ -13,7 +13,7 @@ export default ({questionWithAnswer, asker}: QuestionProps) => {
     
     return (
         <>
-            <div className='QuestionContainer bg-slate-900 text-white text-xl w-11/12 max-w-lg text-left p-5'>
+            <div className='QuestionContainer bg-slate-900 text-white text-xl text-left p-5 w-full'>
                 <div className='Question flex flex-row justify-between'>
                     <div>
                         <div>From: { asker

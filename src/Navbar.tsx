@@ -1,7 +1,8 @@
 import { ChangeEvent, FocusEvent, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useAppContext } from "./context";
-import { ReactComponent as HomeIcon } from "./icons/home_icon.svg";
+import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
+import { ReactComponent as ExpandIcon } from "./icons/expand.svg";
 import { ReactComponent as SearchIcon } from "./icons/search_icon.svg";
 import { User } from "./types";
 import { apiLogOut, apiSearch } from "./utils/apiUtil";
@@ -11,18 +12,19 @@ export default function Navbar(){
     const { context, setContext } = useAppContext();
 
     return (
-        <nav className="w-full flex justify-center items-center gap-16 p-2 bg-white drop-shadow-lg">
-            <div className="w-3/4 justify-between items-center flex flex-row">
-                <Link to="/home"><HomeIcon className="scale-10 h-10"/></Link>
+        <nav className="sticky top-0 z-50 w-full flex justify-center items-center gap-16 p-2 bg-white drop-shadow-md">
+            <div className="w-full lg:w-3/4 xl:w-2/3 justify-between items-center flex flex-row">
+                <Link to="/" className="flex flex-row items-center justify-center">
+                    <AskletIcon className="scale-10 w-10 h-10 fill-blue-300"/>
+                    <h1 className="md:block hidden text-gray-300 text-2xl font-logo">Asklet</h1>
+                </Link>
                 <SearchBar userId={context.currentUser?.user.id}/>
 
                 { context.currentUser ? 
                     <ProfileButton context={context} setContext={setContext}/>
                     :
-                    <Link to={`/login`}>
-                        <button className="w-100 h-100 bg-blue-300 p-2 pl-4 pr-4 rounded-lg text-white">
-                            Log in
-                        </button>
+                    <Link to={`/login`} className="bg-blue-300 rounded-lg p-2 w-16 text-white flex justify-center items-center">
+                        Log in
                     </Link>
                 }
             </div>
@@ -93,7 +95,7 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
     }
 
     return (
-        <div tabIndex={0} onBlur={closeSearchBlur} onFocus={openSearchFocus} className="w-1/2 relative justify-center items-center">
+        <div onBlur={closeSearchBlur} className="w-3/4 md:w-1/2 mx-2 relative justify-center items-center">
             {/* https://stackoverflow.com/questions/60362442/cant-center-absolute-position-tailwind-css */}
             { !isSearching && query === "" && 
                 <div className="pointer-events-none flex flex-row -ml-3 justify-center items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -101,9 +103,9 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
                     <div className="text-gray-400">Search</div>
                 </div>
             }
-            <input ref={inputRef} onChange={onSearchChange} className="w-full p-1 bg-gray-100 border-gray-200 border-2 rounded-lg"></input>
+            <input  tabIndex={0} onFocus={openSearchFocus} ref={inputRef} onChange={onSearchChange} className="w-full p-1 bg-gray-100 focus:outline-none focus:border-blue-300 border-gray-200 border-2 rounded-lg"></input>
             { isSearching &&
-                <div className="bg-white rounded-lg overflow-hidden flex flex-col drop-shadow-lg w-full justify-center items-center absolute left-1/2 transform -translate-x-1/2">
+                <div className="bg-white rounded-lg overflow-hidden flex flex-col drop-shadow-md w-full mt-1 justify-center items-center absolute left-1/2 transform -translate-x-1/2">
                     {isLoading && 
                         <div className="w-full py-2 text-center text-blue-400">
                             Loading...
@@ -128,9 +130,9 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
 
 const ProfileResult = ({user, onProfileClick}: { user: User, onProfileClick: () => void }) => {
     return (
-        <Link onClick={onProfileClick} to={`/user/${user.id}`} className="w-full flex flex-row items-center justify-items-start gap-2 px-2 hover:bg-gray-100 p-2">
+        <Link onClick={onProfileClick} to={`/user/${user.id}`} className="w-full flex flex-row items-center justify-between gap-2 px-2 hover:bg-gray-100 p-2">
            <img src={`${config.ServerURL}/pfps/${user.id}.png`} className="scale-14 h-14 rounded-full"/>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center overflow-hidden">
                <div><b>{user.username}</b></div> 
                <div className="truncate">{user.bio}</div> 
             </div>
@@ -164,11 +166,12 @@ const ProfileButton = ({context, setContext}: ReturnType<typeof useAppContext>) 
     return (
         <div tabIndex={0} onBlur={closeDropdownBlur} className="flex flex-col relative">
             <button className="flex flex-row justify-center items-center gap-2" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                <div>{context.currentUser!.user.username}</div>
-                <img src={`${config.ServerURL}/pfps/${userId}.png`} className="rounded-full scale-10 h-10"/>
+                <img src={`${config.ServerURL}/pfps/${userId}.png`} className="rounded-full scale-10 h-10 w-10 ml-2"/>
+                <div className="md:block hidden">{context.currentUser!.user.username}</div>
+                <ExpandIcon className={`scale-5 h-5 w-5 ${dropdownOpen && "rotate-180"}`}/>
             </button>
             { dropdownOpen && 
-                <div className="rounded-lg overflow-hidden flex flex-col absolute bg-white drop-shadow-lg justify-start top-full right-0 divide-y divide-gray-200">
+                <div className="rounded-lg overflow-hidden flex flex-col absolute bg-white drop-shadow-md justify-start top-full mt-2 w-auto right-0 divide-y divide-gray-200">
                     <div className="flex flex-col">
                         <Link onClick={() => setDropdownOpen(false)} className="inline-block p-4 hover:bg-gray-100" to={`/user/${userId}`}>Profile</Link>
                         <Link onClick={() => setDropdownOpen(false)} className="inline-block p-4 hover:bg-gray-100" to={`/settings`}>Settings</Link>

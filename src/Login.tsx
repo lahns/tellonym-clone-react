@@ -39,7 +39,7 @@ function Login() {
                 return;
               }
               setContext({...context, accessToken: token, currentUser: user });
-              setLocation(`/home`);
+              setLocation(`/`);
             }).catch(err => {
               if (err instanceof Error) {
                 setErrors({ servererr: err.message });
