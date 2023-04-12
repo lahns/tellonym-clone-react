@@ -5,15 +5,16 @@ import Home from './Home';
 import Login from './Login';
 import Navbar from './Navbar';
 import Profile from './Profile';
-import { AppContext, SessionData } from './context';
-import { apiMe, apiRefresh } from './utils/apiUtil';
+import { AppContext, SessionData, useAppContext } from './context';
+import { apiFollows, apiMe, apiRefresh } from './utils/apiUtil';
+import { login } from './utils/utils';
 
-
-function App() {
+const App = () => {
   const [context, setContext] = useState<SessionData>(
     {
       accessToken: null,
-      currentUser: null
+      currentUser: null,
+      following: []
     }
   )
 
@@ -25,18 +26,7 @@ function App() {
           //not logged in, 
           return;
         }
-        apiMe({ 
-          context: {...context, accessToken: token}, 
-          setContext 
-        })
-          .then(user => {
-            if (!user) {
-              //user does not exist
-              return;
-            }
-
-            setContext({...context, accessToken: token, currentUser: user});
-          })
+        login({context: { ...context, accessToken: token}, setContext});
       })  
     .catch(() => { /* server error */ });
   }, []);

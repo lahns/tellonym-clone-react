@@ -1,12 +1,13 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import Badge from "./Badge";
 import Button from "./Button";
 import Question from "./Question";
 import { useAppContext } from "./context";
 import { QuestionWithAnswer, User } from "./types";
-import { apiGetUserQuestions, apiUser } from "./utils/apiUtil";
+import { apiAskQuestion, apiFollow, apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
+import Toggle from "./Toggle";
 
 type ProfileProps = { userId: number };
 
@@ -36,7 +37,7 @@ const Profile = ({userId}: ProfileProps) => {
 
     const ownsProfile = context.currentUser?.user.id === userId;
 
-    const isFollowed = false; // Todo
+    const isFollowed = userData ? context.following?.some(({id}) => userId) : false; // Todo
 
     useEffect(() => {
         // Fetch user data for the profile owner
@@ -69,7 +70,54 @@ const Profile = ({userId}: ProfileProps) => {
         });
     }, [location, userId]);
 
+    const unfollowUser = () => {
+        if (context.currentUser && userData) {
+            apiFollow(userId, { context, setContext }).then(() => {
+                const newFollowing = context.following.filter(user => user.id !== userId);
+                setContext({...context, following: newFollowing});
+            });
+        }
+    }
 
+    const followUser = () => {
+        if (context.currentUser && userData) {
+            apiFollow(userId, { context, setContext }).then(() => {
+                context.following.push(userData);
+                setContext({ ...context });
+            });
+        } 
+    }
+
+    const anonCheckbox = useRef<HTMLInputElement>(null);
+    const questionBox = useRef<HTMLTextAreaElement>(null);
+
+    const askQuestion = () => {
+        if (context.currentUser && userData && anonCheckbox.current && questionBox.current) {
+            const questionContent = questionBox.current.value.trim();
+            const anon = anonCheckbox.current.checked;
+            if (questionContent.length < 10) return //todo: display some error
+            apiAskQuestion(
+                { anonymous: anon, content: questionContent }, 
+                userId, 
+                {context, setContext}
+            ).then(() => {
+                setQuestions([
+                    ...questions, 
+                    {
+                        question: {
+                            id: 0,
+                            content: questionContent,
+                            likes: 0,
+                            asked_id: userId,
+                            asker_id: anon ? null : context.currentUser!.user.id,
+                            asked_at: "now"
+                        },
+                        answer: null
+                    }
+                ])
+            });
+        }
+    }
 
     return (
         <> 
@@ -94,9 +142,9 @@ const Profile = ({userId}: ProfileProps) => {
                                         <Button.Secondary>Edit profile</Button.Secondary>   
                                         :
                                         isFollowed ? 
-                                        <Button.Cancel>Unfollow</Button.Cancel>   
+                                        <Button.Cancel onClick={unfollowUser}>Unfollow</Button.Cancel>   
                                         :
-                                        <Button.Primary>Follow</Button.Primary>   
+                                        <Button.Primary onClick={followUser}>Follow</Button.Primary>   
                                         
                                     }
 
@@ -130,14 +178,12 @@ const Profile = ({userId}: ProfileProps) => {
                         </div>
                         {/* <div className="p-4 self-start font-bold text-black text-xl">Ask me anything</div> */}
                         <div className="w-full md:w-3/4 gap-2 p-4 flex flex-col justify-center items-center">
-                            <textarea className="w-full p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text" rows={4} placeholder="Will you come to my wedding??"/>
+                            <textarea ref={questionBox} disabled={!context.currentUser || ownsProfile} className="w-full p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text" rows={4} placeholder="Will you come to my wedding??"/>
                             <div className="w-full flex flex-row justify-between items-center">
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input defaultChecked type="checkbox" value="" className="sr-only peer"/>
-                                    <div className="w-11 h-6 bg-gray-bg peer-focus:outline-none border-2 border-gray-outline peer-checked:border-primary-bg focus:border-primary-bg peer-focus:ring-2 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-outline after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-bg"></div>
-                                    <span className="ml-3 text-sm text-text-secondary">Anonymous</span>
-                                </label>
-                                <Button.Primary>
+                                <Toggle defaultChecked disabled={!context.currentUser || ownsProfile} ref={anonCheckbox}>
+                                    Anonymous
+                                </Toggle>
+                                <Button.Primary disabled={!context.currentUser || ownsProfile} onClick={askQuestion}>
                                     Ask
                                 </Button.Primary>   
                             </div>
