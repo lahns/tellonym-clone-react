@@ -31,6 +31,7 @@ Button.Primary = ({onClick, additionalStyle, disabled, children}: SubButtonProps
         disabled={disabled}
         onClick={onClick}
         additionalStyle={additionalStyle}
+        border="border-primary-bg border-2 hover:border-primary-onBg"
         bgColor="bg-primary-bg hover:bg-primary-onBg"
         textColor="text-white"
     >

@@ -142,6 +142,7 @@ export const apiFollow = async (user_id: number, context: ReturnType<typeof useA
         null,
         context,
     );
+
 }
 
 export const apiAskQuestion = async ( question: AskData, user_id: number, context: ReturnType<typeof useAppContext>) => {
@@ -203,6 +204,20 @@ export const apiSearch = async (query: string): Promise<User[] | null> => {
             return null;
         }
     }) as User[] | null;        
+}
+
+export const apiFollows = async (userId: number): Promise<User[] | null> => {
+    return await fetchApi(
+        `/users/${userId}/follows`,
+        "GET"
+    )
+    .then(res => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            return null;
+        }
+    }) as User[] | null;
 }
 
 //Add like/dislike api helpers

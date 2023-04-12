@@ -2,6 +2,7 @@ import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { useLocation } from 'wouter';
 import { useAppContext } from './context';
 import { apiLogIn, apiMe } from './utils/apiUtil';
+import { login } from './utils/utils';
 
 const lenFieldValidator = (len: number, err: string): (value: any) => any => {
   return (value) => {
@@ -30,25 +31,14 @@ function Login() {
     ) => {
       apiLogIn({username, password})
         .then(token => {
-            apiMe({ 
-              context: {...context, accessToken: token}, 
-              setContext 
-            }).then(user => {
-              if (!user) {
-                setErrors({ servererr: "User not found" });
-                return;
-              }
-              setContext({...context, accessToken: token, currentUser: user });
-              setLocation(`/`);
-            }).catch(err => {
-              if (err instanceof Error) {
-                setErrors({ servererr: err.message });
-              }
-            });
-          }).catch(err => {
-            if (err instanceof Error) {
-              setErrors({ servererr: err.message });
-            }
+          
+            login({ 
+                context: {...context, accessToken: token}, 
+                setContext,
+              }, 
+              () => setErrors({ servererr: "User not found" }),
+              (err: Error) => setErrors({ servererr: err.message })
+            );
           });
         
       setSubmitting(false);
