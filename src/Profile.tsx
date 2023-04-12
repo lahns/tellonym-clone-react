@@ -2,6 +2,7 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import Badge from "./Badge";
 import Button from "./Button";
+import Loading from "./Loading";
 import Question from "./Question";
 import Textarea from "./Textarea";
 import Toggle from "./Toggle";
@@ -216,6 +217,7 @@ const Profile = ({userId}: ProfileProps) => {
                             </div>
                         </div>
                     </>
+                : <Loading/>
             : "User not found" }
         </>
     );
