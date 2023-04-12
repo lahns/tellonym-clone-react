@@ -1,7 +1,8 @@
 import { Field, Form, Formik, FormikHelpers } from 'formik';
-import { useLocation } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useAppContext } from './context';
 import { apiLogIn, apiMe } from './utils/apiUtil';
+import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
 
 const lenFieldValidator = (len: number, err: string): (value: any) => any => {
   return (value) => {
@@ -55,38 +56,48 @@ function Login() {
     };
 
     return (<>
-    <div>
-      <h1>Log into your account</h1>
+    <div className='w-full flex flex-col p-6 items-center justify-center'>
+                    <Link to="/" className="w-fit flex flex-row items-center justify-center">
+                                        <AskletIcon className="w-16 h-16 fill-primary-bg"/>
+                                        <h1 className="md:block hidden text-gray-onBg text-4xl font-logo">Asklet</h1>
+                    </Link>
+      <h1 className='text-3xl'>Welcome byack!</h1>
       <Formik 
         initialValues={{
           login: '',
           password: '',
         }}
         onSubmit={submitLogin}
+        className='w-full flex flex-col p-3 justify-center items-center'
       >
         {({errors, isSubmitting}) =>
-          <Form>
-            <label htmlFor="login">Login:</label>
-            <Field 
-              validate={lenFieldValidator(3, "The username must be at least 8 characters long")}
-              id="login" 
-              name="login" 
-              placeholder="Your login" 
-            />
-            {errors.login && <div>{errors.login}</div>}
-
-            <label htmlFor="password">Password:</label>
-            <Field 
-              validate={lenFieldValidator(8, "The password must be at least 8 characters long")} 
-              id="password" 
-              name="password" 
-              placeholder="Your password" 
-              type="password"
-            />
-            {errors.password && <div>{errors.password}</div>}
+          <Form className='w-full flex flex-col p-3 justify-center items-center'>
+            <div className='flex-column'>
+                <label htmlFor="login">Login:</label><br/>
+                <Field 
+                  validate={lenFieldValidator(3, "The username must be at least 8 characters long")}
+                  id="login" 
+                  name="login" 
+                  placeholder="Your login"
+                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                />
+                {errors.login && <div>{errors.login}</div>}
+            </div>
+            
+            <div className='flex-column'>
+                <label htmlFor="password">Password:</label><br></br>
+                <Field 
+                  validate={lenFieldValidator(8, "The password must be at least 8 characters long")} 
+                  id="password" 
+                  name="password" 
+                  placeholder="Your password" 
+                  type="password"
+                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                />
+                {errors.password && <div>{errors.password}</div>}
+            </div>
             <button type="submit" disabled={isSubmitting}>Submit</button>
-            {errors.servererr && <div>{errors.servererr}</div>}
-
+                {errors.servererr && <div>{errors.servererr}</div>}
           </Form>
         }
       </Formik>
