@@ -11,7 +11,7 @@ type ButtonProps = {
 
 const Button = ({onClick, bgColor, textColor, border, additionalStyle, disabled, children}: ButtonProps & PropsWithChildren) => {
     return disabled ? 
-        <div onClick={onClick} className={`${additionalStyle} cursor-pointer w-fit h-fit p-2 px-4 border-gray-outline border-2 text-gray-onBg bg-gray-bg font-semibold rounded-lg`}>
+        <div onClick={onClick} className={`${additionalStyle} cursor-not-allowed w-fit h-fit p-2 px-4 border-gray-outline border-2 text-gray-onBg bg-gray-bg font-semibold rounded-lg`}>
             {children}
         </div>
     :   

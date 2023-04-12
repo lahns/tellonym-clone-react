@@ -3,11 +3,12 @@ import { useLocation } from "wouter";
 import Badge from "./Badge";
 import Button from "./Button";
 import Question from "./Question";
+import Textarea from "./Textarea";
+import Toggle from "./Toggle";
 import { useAppContext } from "./context";
 import { QuestionWithAnswer, User } from "./types";
 import { apiAskQuestion, apiFollow, apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
-import Toggle from "./Toggle";
 
 type ProfileProps = { userId: number };
 
@@ -40,6 +41,10 @@ const Profile = ({userId}: ProfileProps) => {
     const isFollowed = userData ? context.following?.some(({id}) => userId) : false; // Todo
 
     useEffect(() => {
+        setUserData(null);
+        setUserExists(true);
+        window.scrollTo(0, 0);
+
         // Fetch user data for the profile owner
         apiUser(userId).then((data) => {
             if (!data) { // User does not exist
@@ -72,18 +77,20 @@ const Profile = ({userId}: ProfileProps) => {
 
     const unfollowUser = () => {
         if (context.currentUser && userData) {
-            apiFollow(userId, { context, setContext }).then(() => {
-                const newFollowing = context.following.filter(user => user.id !== userId);
-                setContext({...context, following: newFollowing});
+            const newFollowing = context.following.filter(user => user.id !== userId);
+            setContext({...context, following: newFollowing});
+            apiFollow(userId, { context, setContext }).catch(() => {
+                // show some kind of error, maybe change the button back
             });
         }
     }
 
     const followUser = () => {
         if (context.currentUser && userData) {
+            context.following.push(userData);
+            setContext({ ...context });
             apiFollow(userId, { context, setContext }).then(() => {
-                context.following.push(userData);
-                setContext({ ...context });
+                // show some kind of error maybe change the button back
             });
         } 
     }
@@ -178,7 +185,7 @@ const Profile = ({userId}: ProfileProps) => {
                         </div>
                         {/* <div className="p-4 self-start font-bold text-black text-xl">Ask me anything</div> */}
                         <div className="w-full md:w-3/4 gap-2 p-4 flex flex-col justify-center items-center">
-                            <textarea ref={questionBox} disabled={!context.currentUser || ownsProfile} className="w-full p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text" rows={4} placeholder="Will you come to my wedding??"/>
+                            <Textarea ref={questionBox} disabled={!context.currentUser || ownsProfile} placeholder="Will you come to my wedding?"/> 
                             <div className="w-full flex flex-row justify-between items-center">
                                 <Toggle defaultChecked disabled={!context.currentUser || ownsProfile} ref={anonCheckbox}>
                                     Anonymous
@@ -209,7 +216,6 @@ const Profile = ({userId}: ProfileProps) => {
                             </div>
                         </div>
                     </>
-                : "Loading..."
             : "User not found" }
         </>
     );

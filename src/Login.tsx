@@ -1,8 +1,8 @@
 import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { Link, useLocation } from 'wouter';
 import { useAppContext } from './context';
-import { apiLogIn, apiMe } from './utils/apiUtil';
 import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
+import { apiLogIn } from './utils/apiUtil';
 import { login } from './utils/utils';
 
 const lenFieldValidator = (len: number, err: string): (value: any) => any => {
@@ -39,7 +39,7 @@ function Login() {
               }, 
               () => setErrors({ servererr: "User not found" }),
               (err: Error) => setErrors({ servererr: err.message })
-            );
+            ).then(() => setLocation("/"));
           });
         
       setSubmitting(false);
