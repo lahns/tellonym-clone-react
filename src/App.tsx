@@ -5,8 +5,8 @@ import Home from './Home';
 import Login from './Login';
 import Navbar from './Navbar';
 import Profile from './Profile';
-import { AppContext, SessionData, useAppContext } from './context';
-import { apiFollows, apiMe, apiRefresh } from './utils/apiUtil';
+import { AppContext, SessionData } from './context';
+import { apiRefresh } from './utils/apiUtil';
 import { login } from './utils/utils';
 
 const App = () => {
@@ -29,7 +29,7 @@ const App = () => {
         login({context: { ...context, accessToken: token}, setContext});
       })  
     .catch(() => { /* server error */ });
-  }, []);
+  });
 
   return (
     <AppContext.Provider value={{context, setContext}}>

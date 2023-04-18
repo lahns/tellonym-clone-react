@@ -10,6 +10,7 @@ import { useAppContext } from "./context";
 import { QuestionWithAnswer, User } from "./types";
 import { apiAskQuestion, apiFollow, apiGetUserQuestions, apiUser } from "./utils/apiUtil";
 import config from "./utils/config";
+import Select from "./Select";
 
 type ProfileProps = { userId: number };
 
@@ -199,7 +200,7 @@ const Profile = ({userId}: ProfileProps) => {
                         <div className="w-full md:w-3/4 p-4 flex flex-col justify-between items-center gap-2">
                             <div className="w-full flex flex-row justify-between items-center">
                                 <div className="font-bold text-black text-xl">Questions</div>
-                                {/* <Select value={sorting} setValues={setSorting} options={sortingOpts}></Select> */}
+                                <Select value={sorting} setValues={setSorting} options={sortingOpts}></Select>
                                 {/* <div className="flex flex-row justify-center items-center rounded-lg">
                                     <div onClick={() => setSorting("likes")} className={`p-2 text-center rounded-l-lg border-gray-200 border-2 border-r-0 hover:bg-gray-100`}>Most liked</div>
                                     <div onClick={() => setSorting("newest")} className={`p-2 text-center rounded-r-lg bg-blue-200 text-blue-800 border-blue-300 border-2 border-l-0 hover:bg-gray-100`}>Newest</div>

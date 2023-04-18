@@ -69,7 +69,7 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newQuery = e.target.value.trim();
 
-        if (isSearching && newQuery == "") {
+        if (isSearching && newQuery === "") {
             setIsSearching(false);
         } else if (!isSearching) {
             setIsSearching(true);
@@ -138,7 +138,7 @@ const SearchBar = ({userId}: { userId: number | undefined }) => {
 const ProfileResult = ({user, onProfileClick}: { user: User, onProfileClick: () => void }) => {
     return (
         <Link onClick={onProfileClick} to={`/user/${user.id}`} className="w-full flex flex-row items-center justify-between gap-2 px-2 hover:bg-gray-bg p-2">
-           <img src={`${config.ServerURL}/pfps/${user.id}.png`} className="scale-14 h-14 rounded-full"/>
+           <img alt="" src={`${config.ServerURL}/pfps/${user.id}.png`} className="scale-14 h-14 rounded-full"/>
             <div className="w-full flex flex-col justify-center overflow-hidden">
                <div className="text-text-header"><b>{user.username}</b></div> 
                <div className="truncate text-text-normal">{user.bio}</div> 
@@ -173,7 +173,7 @@ const ProfileButton = ({context, setContext}: ReturnType<typeof useAppContext>) 
     return (
         <div tabIndex={0} onBlur={closeDropdownBlur} className="flex flex-col relative">
             <div className="flex flex-row justify-center items-center gap-2" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                <img src={`${config.ServerURL}/pfps/${userId}.png`} className="text-text-header rounded-full h-10 w-10"/>
+                <img alt="" src={`${config.ServerURL}/pfps/${userId}.png`} className="text-text-header rounded-full h-10 w-10"/>
                 <div className="md:block hidden text-text-header">{context.currentUser!.user.username}</div>
                 <ExpandIcon className={`h-5 w-5 ${dropdownOpen && "rotate-180"}`}/>
             </div>

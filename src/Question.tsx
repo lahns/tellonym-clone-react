@@ -8,7 +8,7 @@ type QuestionProps = {
     asker: User | null,
 };
 
-export default ({questionWithAnswer, asker}: QuestionProps) => {
+const Question = ({questionWithAnswer, asker}: QuestionProps) => {
     const {question, answer} = questionWithAnswer;
     
     return (
@@ -49,3 +49,5 @@ export default ({questionWithAnswer, asker}: QuestionProps) => {
         </>
     )
 }
+
+export default Question;

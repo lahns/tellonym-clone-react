@@ -19,7 +19,7 @@ const Badge = ({label, link, icon, onClick, textColor}: BadgeProps) => {
     return (
         <a onClick={onClick} href={link} className="flex flex-row gap-2 justify-center items-center">
             <Icon className="w-6 fill-gray-onBg"/>
-            <a className={`${textColor} underline-offset-2 underline hidden md:block truncate`}>{label}</a>
+            <p className={`${textColor} underline-offset-2 underline hidden md:block truncate`}>{label}</p>
         </a>
     );
 }

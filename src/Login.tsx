@@ -24,7 +24,7 @@ type Values = {
 
 function Login() {
     const { context, setContext } = useAppContext();
-    const [ location, setLocation ] = useLocation();
+    const [ , setLocation ] = useLocation();
 
     const submitLogin = (
       { login: username, password }: Values,
