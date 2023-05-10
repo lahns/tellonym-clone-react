@@ -6,7 +6,7 @@ type ButtonProps = {
     textColor: string,
     border?: string,
     disabled?: boolean,
-    additionalStyle?: string
+    additionalStyle?: string,
 }
 
 const Button = ({onClick, bgColor, textColor, border, additionalStyle, disabled, children}: ButtonProps & PropsWithChildren) => {
@@ -63,5 +63,17 @@ Button.Cancel = ({onClick, additionalStyle, disabled, children}: SubButtonProps)
     >
         {children}
     </Button>
+
+// Button.Submit = ({onClick, additionalStyle, disabled, children}: SubButtonProps) => 
+//     <Button
+//         disabled={disabled}
+//         onClick={this != undefined ? this.form.submit : onClick}
+//         additionalStyle={additionalStyle}
+//         border="border-primary-bg border-2 hover:border-primary-onBg"
+//         bgColor="bg-primary-bg hover:bg-primary-onBg"
+//         textColor="text-white"
+//     >
+//         {children}
+//     </Button>;    
 
 export default Button;
