@@ -1,5 +1,6 @@
 import { Field, Form, Formik, FormikHelpers } from 'formik';
 import { Link, useLocation } from 'wouter';
+import Button from './Button';
 import { useAppContext } from './context';
 import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
 import { apiLogIn } from './utils/apiUtil';
@@ -41,7 +42,7 @@ function Login() {
               (err: Error) => setErrors({ servererr: err.message })
             ).then(() => setLocation("/"));
           });
-        
+      console.log(username, password)
       setSubmitting(false);
     };
 
@@ -60,22 +61,19 @@ function Login() {
         onSubmit={submitLogin}
         className='w-full flex flex-col p-3 justify-center items-center'
       >
-        {({errors, isSubmitting}) =>
+        {({errors, isSubmitting, handleSubmit}) =>
           <Form className='w-full flex flex-col p-3 justify-center items-center'>
-            <div className='flex-column'>
-                <label htmlFor="login">Login:</label><br/>
+                <label htmlFor="login" className='text-xl'>Login:</label><br/>
                 <Field 
                   validate={lenFieldValidator(3, "The username must be at least 8 characters long")}
                   id="login" 
                   name="login" 
                   placeholder="Your login"
-                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                  className="w-3/4 p-1 pt-0 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
                 />
                 {errors.login && <div>{errors.login}</div>}
-            </div>
             
-            <div className='flex-column'>
-                <label htmlFor="password">Password:</label><br></br>
+                <label htmlFor="password" className='text-xl mt-2'>Password:</label><br/>
                 <Field 
                   validate={lenFieldValidator(8, "The password must be at least 8 characters long")} 
                   id="password" 
@@ -85,8 +83,7 @@ function Login() {
                   className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
                 />
                 {errors.password && <div>{errors.password}</div>}
-            </div>
-            <button type="submit" disabled={isSubmitting}>Submit</button>
+            <Button.Primary additionalStyle='mt-5' disabled={isSubmitting} onClick={handleSubmit}>Submit</Button.Primary>
                 {errors.servererr && <div>{errors.servererr}</div>}
           </Form>
         }
