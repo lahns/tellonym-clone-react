@@ -69,7 +69,7 @@ function Login() {
                   id="login" 
                   name="login" 
                   placeholder="Your login"
-                  className="w-3/4 p-1 pt-0 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
                 />
                 {errors.login && <div>{errors.login}</div>}
             
