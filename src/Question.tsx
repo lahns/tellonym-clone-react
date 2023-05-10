@@ -16,12 +16,13 @@ const Question = ({questionWithAnswer, asker}: QuestionProps) => {
             <div className='QuestionContainer bg-slate-900 text-white text-xl text-left p-5 w-full'>
                 <div className='Question flex flex-row justify-between'>
                     <div>
-                        <div>From: { asker
+                        <div className="flex flex-row gap-2">From: { asker
                                 ? <Link to={`/user/${asker?.id}`}>
                                     {asker.username}
                                 </Link> 
                                 : "Anonymous"
                             }
+                            <div className="text-slate-700">({question.asked_at})</div>
                         </div>
                         <div>{question.content}</div>
                     </div>
