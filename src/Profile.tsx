@@ -37,12 +37,29 @@ const Profile = ({userId}: ProfileProps) => {
     } as const;
     const [sorting, setSorting] = useState<keyof typeof sortingOpts>("newest");
 
+    const Quotes : string[]= [
+        "Will you come to my wedding?",
+        "Wanna buy some melons?",
+        "What secret conspiracy would you like to start?",
+        "Is cake a lie?",
+        "Do you like broccoli?",
+        "What are your pronouns?",
+        "Will you play a game with me?",
+        "What is your favourite sport?",
+    ];
+    
+
+
+    const [randomQuote, setQuote] = useState("");
+
+
 
     const ownsProfile = context.currentUser?.user.id === userId;
 
     const isFollowed = userData ? context.following?.some(({id}) => userId) : false; // Todo
 
     useEffect(() => {
+        setQuote(Quotes[Math.floor(Math.random()*Quotes.length)]);
         setUserData(null);
         setUserExists(true);
         window.scrollTo(0, 0);
@@ -187,7 +204,7 @@ const Profile = ({userId}: ProfileProps) => {
                         </div>
                         {/* <div className="p-4 self-start font-bold text-black text-xl">Ask me anything</div> */}
                         <div className="w-full md:w-3/4 gap-2 p-4 flex flex-col justify-center items-center">
-                            <Textarea ref={questionBox} disabled={!context.currentUser || ownsProfile} placeholder="Will you come to my wedding?"/> 
+                            <Textarea ref={questionBox} disabled={!context.currentUser || ownsProfile} placeholder={randomQuote}/> 
                             <div className="w-full flex flex-row justify-between items-center">
                                 <Toggle defaultChecked disabled={!context.currentUser || ownsProfile} ref={anonCheckbox}>
                                     Anonymous
