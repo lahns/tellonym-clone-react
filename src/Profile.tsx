@@ -70,34 +70,60 @@ const Profile = ({ userId }: ProfileProps) => {
         "What is your favourite sport?",
     ];
     
+  const Quotes: string[] = [
+    "Will you come to my wedding?",
+    "Wanna buy some melons?",
+    "What secret conspiracy would you like to start?",
+    "Is cake a lie?",
+    "Do you like broccoli?",
+    "What are your pronouns?",
+    "Will you play a game with me?",
+    "What is your favourite sport?",
+  ];
 
+  const [randomQuote, setQuote] = useState("");
 
-    const [randomQuote, setQuote] = useState("");
+  const ownsProfile = context.currentUser?.user.id === userId;
 
+  const isFollowed = userData
+    ? context.following?.some(({ id }) => userId)
+    : false; // Todo
 
+  useEffect(() => {
+    setQuote(Quotes[Math.floor(Math.random() * Quotes.length)]);
+    setUserData(null);
+    setUserExists(true);
+    window.scrollTo(0, 0);
 
-    const ownsProfile = context.currentUser?.user.id === userId;
+    // Fetch user data for the profile owner
+    apiUser(userId).then((data) => {
+      if (!data) {
+        // User does not exist
+        setUserExists(false);
+      } else {
+        setUserData(data);
+      }
+    });
 
-    const isFollowed = userData ? context.following?.some(({id}) => userId) : false; // Todo
+    // Fetch questions for the profile user
+    apiGetUserQuestions(userId).then((data) => {
+      if (!data) return; // User does not exist, dont load the questions
 
-    useEffect(() => {
-        setQuote(Quotes[Math.floor(Math.random()*Quotes.length)]);
-        setUserData(null);
-        setUserExists(true);
-        window.scrollTo(0, 0);
+      const askerIds = data
+        .filter((data) => data.question.asker_id != null)
+        .map((data) => data.question.asker_id!);
 
-        // Fetch user data for the profile owner
-        apiUser(userId).then((data) => {
-            if (!data) { // User does not exist
-                setUserExists(false);
-            } else {                
-                setUserData(data)
-            }
+      askerIds.forEach((id) => {
+        apiUser(id).then((userData) => {
+          if (!userData) return; // User does not exist, just display as anon
+
+          dispatchAskers({ id, userData });
         });
+      });
 
-        // Fetch questions for the profile user
-        apiGetUserQuestions(userId).then((data) => {
-            if (!data) return; // User does not exist, dont load the questions
+      setQuestions(data);
+    });
+  }, [location, userId]);
 
             const askerIds = data
                 .filter(data => data.question.asker_id != null)
@@ -314,6 +340,7 @@ const Profile = ({ userId }: ProfileProps) => {
                 ref={questionBox}
                 disabled={!context.currentUser || ownsProfile}
                 placeholder="Will you come to my wedding?"
+                placeholder={randomQuote}
               />
               <div className="w-full flex flex-row justify-between items-center">
                 <Toggle
