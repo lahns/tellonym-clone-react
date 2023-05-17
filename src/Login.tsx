@@ -42,7 +42,6 @@ function Login() {
               (err: Error) => setErrors({ servererr: err.message })
             ).then(() => setLocation("/"));
           });
-      console.log(username, password)
       setSubmitting(false);
     };
 

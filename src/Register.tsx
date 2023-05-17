@@ -41,11 +41,10 @@ function Register() {
                 context: {...context, accessToken: token}, 
                 setContext,
               }, 
-              () => setErrors({ servererr: "User not found" }),
+              () => setErrors({ servererr: "Your account was created, but we failed to fetch your data. Go to login page to log in." }),
               (err: Error) => setErrors({ servererr: err.message })
             ).then(() => setLocation("/"));
           });
-      console.log(username, password, repeated_password)
       setSubmitting(false);
     } else{
       setErrors({servererr: "Passwords don't match"});
