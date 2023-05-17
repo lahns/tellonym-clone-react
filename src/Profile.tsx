@@ -46,15 +46,17 @@ const Profile = ({ userId }: ProfileProps) => {
 
   // lil hack to automatically sort questions
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
-  
+
   const [{ map: askerMap }, dispatchAskers] = useReducer(askerReducer, {
     map: new Map(),
   });
 
-
   const [sorting, setSorting] = useState<SortingType>("newest");
 
-  const sortQuestions = (questions: QuestionWithAnswer[], sorting: SortingType): QuestionWithAnswer[] => {
+  const sortQuestions = (
+    questions: QuestionWithAnswer[],
+    sorting: SortingType
+  ): QuestionWithAnswer[] => {
     const sorted = questions.sort(
       (
         { question: { likes: likes1, asked_at: asked_at1 } },
@@ -66,21 +68,21 @@ const Profile = ({ userId }: ProfileProps) => {
           const date2 = Date.parse(asked_at2);
 
           return date1 - date2;
-        }
-        else {
+        } else {
           const date1 = Date.parse(asked_at1);
           const date2 = Date.parse(asked_at2);
 
           return date2 - date1;
         }
-    });
+      }
+    );
 
     return sorted;
-  }
+  };
 
   useEffect(() => {
     setQuestions(sortQuestions(questions, sorting));
-  }, [sorting])
+  }, [sorting]);
 
   const sampleQuestions: string[] = [
     "Will you come to my wedding?",
@@ -97,12 +99,12 @@ const Profile = ({ userId }: ProfileProps) => {
 
   const ownsProfile = context.currentUser?.user.id === userId;
 
-  const isFollowed = userData
-    ? context.following?.some(({}) => userId)
-    : false;
+  const isFollowed = userData ? context.following?.some(({}) => userId) : false;
 
   useEffect(() => {
-    setRandomSampleQuestion(sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)]);
+    setRandomSampleQuestion(
+      sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)]
+    );
     setUserData(null);
     setUserExists(true);
     window.scrollTo(0, 0);
@@ -138,14 +140,16 @@ const Profile = ({ userId }: ProfileProps) => {
   }, [location, userId]);
 
   const unfollowUser = () => {
-      if (context.currentUser && userData) {
-          const newFollowing = context.following.filter(user => user.id !== userId);
-          setContext({...context, following: newFollowing});
-          apiFollow(userId, { context, setContext }).catch(() => {
-              // show some kind of error, maybe change the button back
-          });
-      }
+    if (context.currentUser && userData) {
+      const newFollowing = context.following.filter(
+        (user) => user.id !== userId
+      );
+      setContext({ ...context, following: newFollowing });
+      apiFollow(userId, { context, setContext }).catch(() => {
+        // show some kind of error, maybe change the button back
+      });
     }
+  };
 
   const followUser = () => {
     if (context.currentUser && userData) {
@@ -174,20 +178,25 @@ const Profile = ({ userId }: ProfileProps) => {
         context,
         setContext,
       }).then(() => {
-        setQuestions(sortQuestions([
-          ...questions,
-          {
-            question: {
-              id: 0,
-              content: questionContent,
-              likes: 0,
-              asked_id: userId,
-              asker_id: anon ? null : context.currentUser!.user.id,
-              asked_at: new Date(Date.now()).toISOString(),
-            },
-            answer: null,
-          },
-        ], sorting));
+        setQuestions(
+          sortQuestions(
+            [
+              ...questions,
+              {
+                question: {
+                  id: 0,
+                  content: questionContent,
+                  likes: 0,
+                  asked_id: userId,
+                  asker_id: anon ? null : context.currentUser!.user.id,
+                  asked_at: new Date(Date.now()).toISOString(),
+                },
+                answer: null,
+              },
+            ],
+            sorting
+          )
+        );
       });
     }
   };
