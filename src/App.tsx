@@ -8,6 +8,7 @@ import Profile from './Profile';
 import { AppContext, SessionData } from './context';
 import { apiRefresh } from './utils/apiUtil';
 import { login } from './utils/utils';
+import Register from './Register';
 
 const App = () => {
   const [context, setContext] = useState<SessionData>(
@@ -50,6 +51,9 @@ const App = () => {
             </Route>
             <Route path="/login">
               <Login></Login>
+            </Route>
+            <Route path="/register">
+              <Register></Register>
             </Route>
             <Route>
               404
