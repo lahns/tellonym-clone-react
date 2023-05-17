@@ -62,27 +62,27 @@ function Login() {
         className='w-full flex flex-col p-3 justify-center items-center'
       >
         {({errors, isSubmitting, handleSubmit}) =>
-          <Form className='w-full flex flex-col p-3 justify-center items-center'>
-                <label htmlFor="login" className='text-xl'>Login:</label><br/>
+          <Form className='w-full flex flex-col p-3 justify-center items-center gap-2'>
+                <label htmlFor="login" className='text-xl'>Login:</label>
                 <Field 
                   validate={lenFieldValidator(3, "The username must be at least 8 characters long")}
                   id="login" 
                   name="login" 
                   placeholder="Your login"
-                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                  className={`w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 ${errors.login ? "border-error-light" : "border-gray-outline"}`} 
                 />
-                {errors.login && <div>{errors.login}</div>}
+                {errors.login && <div className='text-error-onBg'>{errors.login}</div>}
             
-                <label htmlFor="password" className='text-xl mt-2'>Password:</label><br/>
+                <label htmlFor="password" className='text-xl'>Password:</label>
                 <Field 
                   validate={lenFieldValidator(8, "The password must be at least 8 characters long")} 
                   id="password" 
                   name="password" 
                   placeholder="Your password" 
                   type="password"
-                  className="w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 " 
+                  className={`w-3/4 p-1 bg-gray-bg focus:outline-none focus:border-primary-bg border-gray-outline border-2 rounded-lg placeholder-gray-text md:w-2/5 lg:w-1/8 ${errors.password ? "border-error-light" : "border-gray-outline"} `} 
                 />
-                {errors.password && <div>{errors.password}</div>}
+                {errors.password && <div className='text-error-onBg'>{errors.password}</div>}
             <Button.Primary additionalStyle='mt-5' disabled={isSubmitting} onClick={handleSubmit}>Submit</Button.Primary>
                 {errors.servererr && <div>{errors.servererr}</div>}
           </Form>
