@@ -296,7 +296,7 @@ const Profile = ({ userId }: ProfileProps) => {
               </div>
               <div className="flex flex-col justify-center items-center">
                 <div className="text-text-header font-bold text-3xl">
-                  {/*TODO: change this later*/} 6
+                  { questions.length }
                 </div>
                 <div className="font-thin text-text-secondary">Questions</div>
               </div>
