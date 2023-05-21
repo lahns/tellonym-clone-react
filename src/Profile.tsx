@@ -196,6 +196,7 @@ const Profile = ({ userId }: ProfileProps) => {
             sorting
           )
         );
+        if (questionBox.current) questionBox.current.value = "";
       });
     }
   };
