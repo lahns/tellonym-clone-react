@@ -88,7 +88,7 @@ const Profile = ({ userId }: ProfileProps) => {
     "Will you come to my wedding?",
     "Wanna buy some melons?",
     "What secret conspiracy would you like to start?",
-    "Is cake a lie?",
+    "Is the cake a lie?",
     "Do you like broccoli?",
     "What are your pronouns?",
     "Will you play a game with me?",
@@ -210,11 +210,11 @@ const Profile = ({ userId }: ProfileProps) => {
                 <img
                   className="object-cover h-24 md:h-44 w-full"
                   alt=""
-                  src={`https://picsum.photos/800`}
+                  src={`${config.ServerURL}/bgs/${userData.id}.jpg`}
                 ></img>
-                <div className="w-36 md:w-44 md:h-44 h-36 border-white border-8 absolute rounded-full overflow-hidden md:top-1/2 top-1/4 bg-white left-0 ml-4 md:ml-0 md:left-[14%]">
+                <div className="w-36 md:w-44 md:h-44 h-36 flex justify-center items-center border-white border-8 absolute rounded-full overflow-hidden md:top-1/2 top-1/4 bg-white left-0 ml-4 md:ml-0 md:left-[14%]">
                   <img
-                    className="object-cover w-36 md:w-44 h-36 md:h-44"
+                    className="w-36 md:w-44 h-36 md:h-44"
                     alt=""
                     src={`${config.ServerURL}/pfps/${userData.id}.png`}
                   ></img>
@@ -229,7 +229,11 @@ const Profile = ({ userId }: ProfileProps) => {
                 </div>
                 <div className="w-fit flex flex-col md:flex-row justify-end items-end">
                   {ownsProfile ? (
-                    <Button.Secondary>Edit profile</Button.Secondary>
+                    <Button.Secondary
+                      
+                    >
+                      Edit profile
+                    </Button.Secondary>
                   ) : context.following?.some(({id}) => userId === id) ? (
                     <Button.Cancel onClick={unfollowUser}>
                       Unfollow
@@ -248,13 +252,34 @@ const Profile = ({ userId }: ProfileProps) => {
               </div>
             </div>
             <div className="w-full md:w-3/4 flex flex-row gap-4 justify-start items-center px-4 pb-4">
-              <Badge.Youtube label="@tester223" link="https://youtube.com/" />
-              <Badge.Twitter label="@testerpl" link="https://twitter.com/" />
-              <Badge.Instagram
-                label="tester.pl"
-                link="https://instagram.com/"
+              { userData.youtube ? 
+                <Badge.Youtube 
+                  label={`@${userData.youtube}`}
+                  link={`https://youtube.com/@${userData.youtube}`}
+                />
+                : null
+              }
+              { userData.twitter ? 
+              <Badge.Twitter 
+                label={`@${userData.twitter}`}
+                link={`https://twitter.com/${userData.twitter}`}
               />
-              <Badge.Twitch label="testerowicz" link="https://twitch.com/" />
+                : null
+              }
+              { userData.instagram ? 
+              <Badge.Instagram
+                label={userData.instagram}
+                link={`https://instagram.com/${userData.instagram}`}
+              />
+                : null
+              }
+              { userData.twitch ? 
+              <Badge.Twitch 
+                label={userData.twitch}
+                link={`https://twitch.com/${userData.twitch}`}
+              />
+                : null
+              }
             </div>
             <div className="w-full flex flex-row justify-evenly items-start p-4">
               <div className="flex flex-col justify-center items-center">
@@ -309,17 +334,24 @@ const Profile = ({ userId }: ProfileProps) => {
                 ></Select>
               </div>
               <div className="w-full rounded-lg overflow-hidden">
-                {questions.map((qwa, index) => (
-                  <Question
-                    key={index}
-                    questionWithAnswer={qwa}
-                    asker={
-                      qwa.question.asker_id
-                        ? askerMap.get(qwa.question.asker_id) ?? null
-                        : null
-                    }
-                  />
-                ))}
+                {
+                  questions.length === 0 ?
+                    <div className="text-gray-outline text-3xl font-bold text-center">
+                      No questions yet
+                    </div>
+                  :
+                  questions.map((qwa, index) => (
+                    <Question
+                      key={index}
+                      questionWithAnswer={qwa}
+                      asker={
+                        qwa.question.asker_id
+                          ? askerMap.get(qwa.question.asker_id) ?? null
+                          : null
+                      }
+                    />
+                  ))
+                }
               </div>
             </div>
           </>

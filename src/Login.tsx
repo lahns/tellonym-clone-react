@@ -108,7 +108,7 @@ function Login() {
               <Button.Primary
                 additionalStyle="mt-5"
                 disabled={isSubmitting}
-                onClick={(e) => handleSubmit}
+                onClick={(e) => handleSubmit()}
               >
                 Submit
               </Button.Primary>

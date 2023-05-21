@@ -32,6 +32,10 @@ export type User = {
   follower_count: number;
   following_count: number;
   bio: string;
+  twitch: string;
+  twitter: string;
+  youtube: string;
+  instagram: string;
 };
 
 export type Like = {
