@@ -67,12 +67,12 @@ const Profile = ({ userId }: ProfileProps) => {
           const date1 = Date.parse(asked_at1);
           const date2 = Date.parse(asked_at2);
 
-          return date1 - date2;
+          return date2 - date1;
         } else {
           const date1 = Date.parse(asked_at1);
           const date2 = Date.parse(asked_at2);
 
-          return date2 - date1;
+          return date1 - date2;
         }
       }
     );
@@ -126,6 +126,8 @@ const Profile = ({ userId }: ProfileProps) => {
         .filter((data) => data.question.asker_id != null)
         .map((data) => data.question.asker_id!);
 
+      const sortedQuestions = sortQuestions(data, sorting);
+
       askerIds.forEach((id) => {
         apiUser(id).then((userData) => {
           if (!userData) return; // User does not exist, just display as anon
@@ -134,7 +136,7 @@ const Profile = ({ userId }: ProfileProps) => {
         });
       });
 
-      setQuestions(sortQuestions(data, sorting));
+      setQuestions(sortedQuestions);
     });
   }, [location, userId]);
 
