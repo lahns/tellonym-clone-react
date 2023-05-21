@@ -99,7 +99,6 @@ const Profile = ({ userId }: ProfileProps) => {
 
   const ownsProfile = context.currentUser?.user.id === userId;
 
-  const isFollowed = userData ? context.following?.some(({}) => userId) : false;
 
   useEffect(() => {
     setRandomSampleQuestion(
@@ -213,9 +212,9 @@ const Profile = ({ userId }: ProfileProps) => {
                   alt=""
                   src={`https://picsum.photos/800`}
                 ></img>
-                <div className="w-36 md:w-44 border-white border-8 absolute rounded-full overflow-hidden md:top-1/2 top-1/4 bg-white left-0 ml-4 md:ml-0 md:left-[14%]">
+                <div className="w-36 md:w-44 md:h-44 h-36 border-white border-8 absolute rounded-full overflow-hidden md:top-1/2 top-1/4 bg-white left-0 ml-4 md:ml-0 md:left-[14%]">
                   <img
-                    className="object-cover"
+                    className="object-cover w-36 md:w-44 h-36 md:h-44"
                     alt=""
                     src={`${config.ServerURL}/pfps/${userData.id}.png`}
                   ></img>
@@ -231,7 +230,7 @@ const Profile = ({ userId }: ProfileProps) => {
                 <div className="w-fit flex flex-col md:flex-row justify-end items-end">
                   {ownsProfile ? (
                     <Button.Secondary>Edit profile</Button.Secondary>
-                  ) : isFollowed ? (
+                  ) : context.following?.some(({id}) => userId === id) ? (
                     <Button.Cancel onClick={unfollowUser}>
                       Unfollow
                     </Button.Cancel>

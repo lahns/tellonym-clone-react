@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, MouseEvent, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
@@ -6,7 +6,7 @@ import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
 import { ReactComponent as ExpandIcon } from "./icons/expand.svg";
 import { ReactComponent as SearchIcon } from "./icons/search_icon.svg";
 import { User } from "./types";
-import { apiLogOut, apiSearch } from "./utils/apiUtil";
+import { apiFollow, apiLogOut, apiSearch } from "./utils/apiUtil";
 import config from "./utils/config";
 
 export default function Navbar() {
@@ -26,7 +26,7 @@ export default function Navbar() {
             </h1>
           </Link>
         </div>
-        <SearchBar userId={context.currentUser?.user.id} />
+        <SearchBar userId={context.currentUser?.user.id} context={context} setContext={setContext} />
 
         <div className="w-1/7 md:w-1/5 lg:w-1/4 flex flex-row justify-end items-center">
           {context.currentUser ? (
@@ -42,7 +42,7 @@ export default function Navbar() {
   );
 }
 
-const SearchBar = ({ userId }: { userId: number | undefined }) => {
+const SearchBar = ({ userId, context, setContext }: { userId: number | undefined } & ReturnType<typeof useAppContext>) => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -139,6 +139,8 @@ const SearchBar = ({ userId }: { userId: number | undefined }) => {
               key={user.id}
               user={user}
               onProfileClick={onProfileClick}
+              context={context}
+              setContext={setContext}
             />
           ))}
           {filteredUsers.length > 5 && (
@@ -160,10 +162,39 @@ const SearchBar = ({ userId }: { userId: number | undefined }) => {
 const ProfileResult = ({
   user,
   onProfileClick,
+  context,
+  setContext
 }: {
   user: User;
   onProfileClick: () => void;
-}) => {
+} & ReturnType<typeof useAppContext>) => {
+
+  const unfollowUser = (e: MouseEvent) => {
+    if (context.currentUser) {
+      const newFollowing = context.following.filter(
+        ({id}) => user.id !== id 
+      );
+      setContext({ ...context, following: newFollowing });
+      apiFollow(user.id, { context, setContext }).catch(() => {
+        // show some kind of error, maybe change the button back
+      });
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const followUser = (e: MouseEvent) => {
+    if (context.currentUser) {
+      context.following.push(user);
+      setContext({ ...context });
+      apiFollow(user.id, { context, setContext }).then(() => {
+        // show some kind of error maybe change the button back
+      });
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
   return (
     <Link
       onClick={onProfileClick}
@@ -173,7 +204,7 @@ const ProfileResult = ({
       <img
         alt=""
         src={`${config.ServerURL}/pfps/${user.id}.png`}
-        className="scale-14 h-14 rounded-full"
+        className="scale-14 h-14 w-14 rounded-full"
       />
       <div className="w-full flex flex-col justify-center overflow-hidden">
         <div className="text-text-header">
@@ -181,7 +212,22 @@ const ProfileResult = ({
         </div>
         <div className="truncate text-text-normal">{user.bio}</div>
       </div>
-      <Button.Primary>Follow</Button.Primary>
+      { 
+        context.following.find(({id}) => id === user.id) ?
+        <Button.Cancel 
+          onClick={unfollowUser}
+        >
+          Unfollow
+        </Button.Cancel>
+        :
+        <Button.Primary 
+          onClick={followUser}
+          disabled={!context.currentUser}
+        >
+          Follow
+        </Button.Primary>
+      }
+
     </Link>
   );
 };
@@ -196,7 +242,7 @@ const ProfileButton = ({
   const logOut = () => {
     apiLogOut()
       .then(() => {
-        setContext({ ...context, accessToken: null, currentUser: null });
+        setContext({ ...context, accessToken: null, currentUser: null, following: [] });
         setDropdownOpen(false);
       })
       .catch(() => {

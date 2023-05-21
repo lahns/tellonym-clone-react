@@ -3,9 +3,8 @@ import { Link, useLocation } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
 import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
-import { apiLogIn } from "./utils/apiUtil";
-import { login } from "./utils/utils";
 import { apiRegisterUser } from "./utils/apiUtil";
+import { login } from "./utils/utils";
 
 const lenFieldValidator = (len: number, err: string): ((value: any) => any) => {
   return (value) => {
@@ -142,7 +141,7 @@ function Register() {
               <Button.Primary
                 additionalStyle="mt-5"
                 disabled={isSubmitting}
-                onClick={handleSubmit}
+                onClick={(e) => handleSubmit}
               >
                 Submit
               </Button.Primary>

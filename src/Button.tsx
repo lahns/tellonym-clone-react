@@ -1,7 +1,7 @@
-import { PropsWithChildren } from "react";
+import { MouseEvent, PropsWithChildren } from "react";
 
 type ButtonProps = {
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
   bgColor: string;
   textColor: string;
   border?: string;
@@ -20,14 +20,18 @@ const Button = ({
 }: ButtonProps & PropsWithChildren) => {
   return disabled ? (
     <div
-      onClick={onClick}
+      onClick={(e) => {
+        if (onClick) onClick(e);
+      }}
       className={`${additionalStyle} cursor-not-allowed w-fit h-fit p-2 px-4 border-gray-outline border-2 text-gray-onBg bg-gray-bg font-semibold rounded-lg`}
     >
       {children}
     </div>
   ) : (
     <div
-      onClick={onClick}
+      onClick={(e) => {
+        if (onClick) onClick(e);
+      }}
       className={`${additionalStyle} cursor-pointer w-fit h-fit p-2 px-4 ${border} ${bgColor} ${textColor} font-semibold rounded-lg`}
     >
       {children}
@@ -36,7 +40,7 @@ const Button = ({
 };
 
 type SubButtonProps = {
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
   additionalStyle?: string;
   disabled?: boolean;
 } & PropsWithChildren;
@@ -88,7 +92,7 @@ Button.Cancel = ({
     onClick={onClick}
     additionalStyle={additionalStyle}
     border="border-error-bg border-2"
-    bgColor="bg-white hover:bg-error-bg"
+    bgColor="bg-transparent hover:bg-error-bg"
     textColor="text-error-bg hover:text-white"
   >
     {children}

@@ -5,10 +5,10 @@ import Home from "./Home";
 import Login from "./Login";
 import Navbar from "./Navbar";
 import Profile from "./Profile";
+import Register from "./Register";
 import { AppContext, SessionData } from "./context";
 import { apiRefresh } from "./utils/apiUtil";
 import { login } from "./utils/utils";
-import Register from "./Register";
 
 const App = () => {
   const [context, setContext] = useState<SessionData>({
@@ -19,17 +19,19 @@ const App = () => {
 
   useEffect(() => {
     //Try to log in the user automatically
-    apiRefresh()
-      .then((token) => {
-        if (!token) {
-          //not logged in,
-          return;
-        }
-        login({ context: { ...context, accessToken: token }, setContext });
-      })
-      .catch(() => {
-        /* server error */
-      });
+    if (context.accessToken == null) {
+      apiRefresh()
+        .then((token) => {
+          if (!token) {
+            //not logged in,
+            return;
+          }
+          login({ context: { ...context, accessToken: token }, setContext });
+        })
+        .catch(() => {
+          /* server error */
+        });
+    }
   });
 
   return (

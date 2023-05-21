@@ -108,12 +108,13 @@ const Select = <U extends Record<string, string>>({
           >
             {options[first]}
           </SelectSegment>
-          {mid.map((opt) => (
+          {mid.map((opt, idx) => (
             <SelectSegment
               currentValue={value}
               segmentValue={opt}
               onclick={() => setValues(opt)}
               type="middle"
+              key={idx}
             >
               {options[opt]}
             </SelectSegment>
