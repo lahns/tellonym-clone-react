@@ -93,6 +93,7 @@ const Profile = ({ userId }: ProfileProps) => {
     "What are your pronouns?",
     "Will you play a game with me?",
     "What is your favourite sport?",
+    "What is melon going to be smelling today?"
   ];
 
   const [randomSampleQuestion, setRandomSampleQuestion] = useState("");

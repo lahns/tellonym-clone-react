@@ -220,4 +220,18 @@ export const apiFollows = async (userId: number): Promise<User[] | null> => {
     }) as User[] | null;
 }
 
+export const apiFollowers = async (userId: number): Promise<User[] | null> => {
+    return await fetchApi(
+        `/users/${userId}/followers`,
+        "GET"
+    )
+    .then(res => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            return null;
+        }
+    }) as User[] | null;
+}
+
 //Add like/dislike api helpers
