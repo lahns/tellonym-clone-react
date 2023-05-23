@@ -127,9 +127,11 @@ const Profile = ({ userId }: ProfileProps) => {
         .filter((data) => data.question.asker_id != null)
         .map((data) => data.question.asker_id!);
 
+      const uniqueAskerIds = Array.from(new Set(askerIds));
+
       const sortedQuestions = sortQuestions(data, sorting);
 
-      askerIds.forEach((id) => {
+      uniqueAskerIds.forEach((id) => {
         apiUser(id).then((userData) => {
           if (!userData) return; // User does not exist, just display as anon
 
