@@ -105,13 +105,15 @@ function Login() {
               {errors.password && (
                 <div className="text-error-onBg">{errors.password}</div>
               )}
-              <Button.Primary
-                additionalStyle="mt-5"
-                disabled={isSubmitting}
-                onClick={(e) => handleSubmit()}
-              >
-                Submit
-              </Button.Primary>
+              <div className="flex mt-5 flex-row w-3/4 md:w-2/5 lg:w-1/8 justify-between items-center">
+                <Link to="/register" className="text-primary-bg hover:underline">Create an account?</Link>
+                <Button.Primary
+                  disabled={isSubmitting}
+                  onClick={(e) => handleSubmit()}
+                >
+                  Submit
+                </Button.Primary>
+              </div>
               {errors.servererr && <div>{errors.servererr}</div>}
             </Form>
           )}

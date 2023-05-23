@@ -138,13 +138,15 @@ function Register() {
                   {errors.repeated_password}
                 </div>
               )}
-              <Button.Primary
-                additionalStyle="mt-5"
-                disabled={isSubmitting}
-                onClick={(e) => handleSubmit()}
-              >
-                Submit
-              </Button.Primary>
+              <div className="flex mt-5 flex-row w-3/4 md:w-2/5 lg:w-1/8 justify-between items-center">
+                <Link to="/login" className="text-primary-bg hover:underline">Log in?</Link>
+                <Button.Primary
+                  disabled={isSubmitting}
+                  onClick={(e) => handleSubmit()}
+                >
+                  Submit
+                </Button.Primary>
+              </div>
               {errors.servererr && (
                 <div className="text-error-onBg">{errors.servererr}</div>
               )}
