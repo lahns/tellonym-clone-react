@@ -93,13 +93,14 @@ const Profile = ({ userId }: ProfileProps) => {
 
 
   useEffect(() => {
+    
     setRandomSampleQuestion(
       sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)]
-    );
+      );
     setUserData(null);
     setUserExists(true);
     window.scrollTo(0, 0);
-
+    
     // Fetch user data for the profile owner
     apiUser(userId).then((data) => {
       if (!data) {
@@ -107,9 +108,10 @@ const Profile = ({ userId }: ProfileProps) => {
         setUserExists(false);
       } else {
         setUserData(data);
+        document.title = `${data.username}'s profile`;
       }
     });
-
+    
     apiGetUserQuestions(userId).then((data) => {
       if (!data) return;
 

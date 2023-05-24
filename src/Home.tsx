@@ -13,6 +13,7 @@ const Home = () => {
 
 
   useEffect(() => {
+    document.title = "Home";
     (async () => {
       if (context.currentUser != null) {
         let follows: number[] = [];

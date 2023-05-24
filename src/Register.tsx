@@ -1,4 +1,5 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
+import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
@@ -52,6 +53,12 @@ function Register() {
       setErrors({ servererr: "Passwords don't match" });
     }
   };
+
+  
+  useEffect(() => {
+    document.title = `Register`;
+  });
+
 
   return (
     <>

@@ -1,8 +1,9 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
+import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
-import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
+import { ReactComponent as AskletIcon } from './icons/asklet2.svg';
 import { apiLogIn } from "./utils/apiUtil";
 import { login } from "./utils/utils";
 
@@ -43,6 +44,10 @@ function Login() {
     });
     setSubmitting(false);
   };
+
+  useEffect(() => {
+    document.title = `Log in`;
+  });
 
   return (
     <>
