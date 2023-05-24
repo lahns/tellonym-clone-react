@@ -33,7 +33,7 @@ function Register() {
     { login: username, password, repeated_password }: Values,
     { setSubmitting, setErrors }: FormikHelpers<Values>
   ) => {
-    if (password == repeated_password) {
+    if (password === repeated_password) {
       apiRegisterUser({ username, password }).then((token) => {
         login(
           {

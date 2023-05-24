@@ -72,7 +72,7 @@ const Profile = ({ userId }: ProfileProps) => {
   };
 
   useEffect(() => {
-    setQuestions(sortQuestions(questions, sorting));
+    setQuestions(oldQuestions => sortQuestions(oldQuestions, sorting));
   }, [sorting]);
 
   const sampleQuestions: string[] = [
@@ -87,16 +87,14 @@ const Profile = ({ userId }: ProfileProps) => {
     "What is melon going to be smelling today?"
   ];
 
-  const [randomSampleQuestion, setRandomSampleQuestion] = useState("");
+  const [randomSampleQuestion] = useState(
+    sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)]
+  );
 
   const ownsProfile = context.currentUser?.user.id === userId;
 
 
   useEffect(() => {
-    
-    setRandomSampleQuestion(
-      sampleQuestions[Math.floor(Math.random() * sampleQuestions.length)]
-      );
     setUserData(null);
     setUserExists(true);
     window.scrollTo(0, 0);
