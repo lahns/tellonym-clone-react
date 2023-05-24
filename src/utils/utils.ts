@@ -1,5 +1,6 @@
 import { useAppContext } from "../context";
-import { apiFollows, apiMe } from "./apiUtil";
+import { QuestionWithAnswer, User } from "../types";
+import { apiFollows, apiMe, apiUser } from "./apiUtil";
 
 export const login = async (
   { context, setContext }: ReturnType<typeof useAppContext>,
@@ -18,3 +19,25 @@ export const login = async (
     setContext({ ...context, currentUser: user, following: following ?? [] });
   }
 };
+
+export const fetchAskerData = async (questions: QuestionWithAnswer[]): Promise<Map<number, User>> => {
+  const map = new Map();
+
+  const askerIds = questions 
+    .filter(({question}) => question.asker_id != null)
+    .map(({question}) => question.asker_id!)
+    
+  const uniqueAskerIds = Array.from(new Set(askerIds));
+  
+  const promises = uniqueAskerIds.map((id) => {
+    return apiUser(id).then((userData) => {
+      if (!userData) return; //User does not exist for some reason
+
+      return () => { map.set(id, userData); }
+    })
+  });
+
+  await Promise.all(promises).then(funcs => funcs.forEach(func => func && func()));
+
+  return map;
+}

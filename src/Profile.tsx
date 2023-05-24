@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import Badge from "./Badge";
 import Button from "./Button";
@@ -16,6 +16,7 @@ import {
   apiUser,
 } from "./utils/apiUtil";
 import config from "./utils/config";
+import { fetchAskerData } from "./utils/utils";
 
 type ProfileProps = { userId: number };
 
@@ -26,14 +27,6 @@ const sortingOpts = {
 } as const;
 
 type SortingType = keyof typeof sortingOpts;
-
-const askerReducer = (
-  { map }: { map: Map<number, User> },
-  { id, userData }: { id: number; userData: User }
-) => {
-  map.set(id, userData);
-  return { map };
-};
 
 const Profile = ({ userId }: ProfileProps) => {
   //Needed to refresh the page when url changes
@@ -47,9 +40,7 @@ const Profile = ({ userId }: ProfileProps) => {
   // lil hack to automatically sort questions
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
 
-  const [{ map: askerMap }, dispatchAskers] = useReducer(askerReducer, {
-    map: new Map(),
-  });
+  const [askerMap, setAskerMap] = useState<Map<number, User>>(new Map());
 
   const [sorting, setSorting] = useState<SortingType>("newest");
 
@@ -119,26 +110,12 @@ const Profile = ({ userId }: ProfileProps) => {
       }
     });
 
-    // Fetch questions for the profile user
     apiGetUserQuestions(userId).then((data) => {
-      if (!data) return; // User does not exist, dont load the questions
+      if (!data) return;
 
-      const askerIds = data
-        .filter((data) => data.question.asker_id != null)
-        .map((data) => data.question.asker_id!);
+      fetchAskerData(data).then(map => setAskerMap(map))
 
-      const uniqueAskerIds = Array.from(new Set(askerIds));
-
-      const sortedQuestions = sortQuestions(data, sorting);
-
-      uniqueAskerIds.forEach((id) => {
-        apiUser(id).then((userData) => {
-          if (!userData) return; // User does not exist, just display as anon
-
-          dispatchAskers({ id, userData });
-        });
-      });
-
+      const sortedQuestions = sortQuestions(data, "newest");
       setQuestions(sortedQuestions);
     });
   }, [location, userId]);

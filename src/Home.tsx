@@ -1,24 +1,15 @@
-import { useEffect, useReducer, useState } from "react";
-import { useAppContext } from "./context";
-import {QuestionWithAnswer, User } from "./types";
-import { apiFollowers, apiGetUserQuestions } from "./utils/apiUtil";
+import { useEffect, useState } from "react";
 import Question from "./Question";
+import { useAppContext } from "./context";
+import { QuestionWithAnswer, User } from "./types";
+import { apiGetUserQuestions } from "./utils/apiUtil";
+import { fetchAskerData } from "./utils/utils";
 
 const Home = () => {
   const [qwas, setqwas] = useState<QuestionWithAnswer[] | null>(null);
   const { context } = useAppContext();
 
-  const askerReducer = (
-    { map }: { map: Map<number, User> },
-    { id, userData }: { id: number; userData: User }
-  ) => {
-    map.set(id, userData);
-    return { map };
-  };
-
-  const [{ map: askerMap }, dispatchAskers] = useReducer(askerReducer, {
-    map: new Map(),
-  });
+  const [askerMap, setAskerMap] = useState<Map<number, User>>(new Map())
 
 
   useEffect(() => {
@@ -38,7 +29,11 @@ const Home = () => {
           }
         }
 
-        if (qwas === null) setqwas(questions_of_following);
+        if (qwas === null) {
+          setqwas(questions_of_following);
+          fetchAskerData(questions_of_following).then(map => setAskerMap(map));
+        } 
+
         console.log(qwas);
       }
     })();
