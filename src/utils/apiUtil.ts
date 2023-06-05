@@ -73,7 +73,7 @@ export const apiRefresh = async (): Promise<AccessToken | null> => {
 }
 
 export const apiEditProfile = async (form_data: FormData, context: ReturnType<typeof useAppContext>) => {
-    await fetchApi(
+    return await fetchApi(
         "/editprofile",
         "POST",
         { data: form_data, __type: "form" } as FormBody,

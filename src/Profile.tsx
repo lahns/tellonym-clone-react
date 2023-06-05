@@ -16,7 +16,7 @@ import {
   apiUser,
 } from "./utils/apiUtil";
 import config from "./utils/config";
-import { fetchAskerData } from "./utils/utils";
+import { fetchAskedData, fetchAskerData } from "./utils/utils";
 
 type ProfileProps = { userId: number };
 
@@ -40,10 +40,13 @@ const Profile = ({ userId }: ProfileProps) => {
   // lil hack to automatically sort questions
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
 
+  const [askedMap, setAskedMap] = useState<Map<number, User>>(new Map())
   const [askerMap, setAskerMap] = useState<Map<number, User>>(
     context.currentUser ? new Map([[context.currentUser.user.id, context.currentUser]])
     : new Map()
   );
+
+  const [currentlySelectedQuestion, setCurrentlySelectedQuestion] = useState<number | null>(null);
 
   const [sorting, setSorting] = useState<SortingType>("newest");
 
@@ -117,6 +120,7 @@ const Profile = ({ userId }: ProfileProps) => {
       if (!data) return;
 
       fetchAskerData(data).then(map => setAskerMap(map))
+      fetchAskedData(data).then(map => setAskedMap(map));
 
       const sortedQuestions = sortQuestions(data, "newest");
       setQuestions(sortedQuestions);
@@ -196,7 +200,7 @@ const Profile = ({ userId }: ProfileProps) => {
                 <img
                   className="object-cover h-24 md:h-44 w-full"
                   alt=""
-                  src={`${config.ServerURL}/bgs/${userData.id}.jpg`}
+                  src={`${config.ServerURL}/bgs/${userData.id}.png`}
                 ></img>
                 <div className="w-36 md:w-44 md:h-44 h-36 flex justify-center items-center border-white border-8 absolute rounded-full overflow-hidden md:top-1/2 top-1/4 bg-white left-0 ml-4 md:ml-0 md:left-[14%]">
                   <img
@@ -319,7 +323,7 @@ const Profile = ({ userId }: ProfileProps) => {
                   options={sortingOpts}
                 ></Select>
               </div>
-              <div className="w-full rounded-lg overflow-hidden">
+              <div className="w-full rounded-md overflow-hidden  divide-y-2 divide-gray-outline">
                 {
                   questions.length === 0 ?
                     <div className="text-gray-outline text-3xl font-bold text-center">
@@ -335,6 +339,16 @@ const Profile = ({ userId }: ProfileProps) => {
                           ? askerMap.get(qwa.question.asker_id) ?? null
                           : null
                       }
+                      asked={
+                        //kms
+                        askedMap.get(qwa.question.asked_id) ?? { username: "Deleted user", bio: "", id: -1, follower_count: 0, following_count: 0, instagram: "", twitch: "", twitter: "", youtube: ""}
+                      }
+                      setSelected={() => currentlySelectedQuestion === index ? setCurrentlySelectedQuestion(null) : setCurrentlySelectedQuestion(index) }
+                      selected={currentlySelectedQuestion == index}
+                      position={
+                        index == 0 ? 'first' : (index == questions.length-1 ? 'last' : null)
+                      }
+                      showAsked={false}
                     />
                   ))
                 }

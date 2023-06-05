@@ -1,47 +1,39 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
 import { ReactComponent as AskletIcon } from './icons/asklet2.svg';
 import { apiLogIn } from "./utils/apiUtil";
-import { login } from "./utils/utils";
+import { login, minLenFieldValidator } from "./utils/utils";
 
-const lenFieldValidator = (len: number, err: string): ((value: any) => any) => {
-  return (value) => {
-    if (value && typeof value === "string") {
-      if (value.length < len) {
-        return err;
-      }
-    }
-    return;
-  };
-};
 
 type Values = {
   login: string;
   password: string;
-  servererr?: string;
 };
 
 function Login() {
   const { context, setContext } = useAppContext();
   const [, setLocation] = useLocation();
 
+  const [ servererr, setServerErr ] = useState<string | null>(null);
+
   const submitLogin = (
     { login: username, password }: Values,
     { setSubmitting, setErrors }: FormikHelpers<Values>
   ) => {
+    setServerErr(null);
     apiLogIn({ username, password }).then((token) => {
       login(
         {
           context: { ...context, accessToken: token },
           setContext,
         },
-        () => setErrors({ servererr: "User not found" }),
-        (err: Error) => setErrors({ servererr: err.message })
+        () => setServerErr("User not found"),
+        (err: Error) => setServerErr(err.message)
       ).then(() => setLocation("/"));
-    });
+    }).catch(() => setServerErr("User not found"));
     setSubmitting(false);
   };
 
@@ -76,7 +68,7 @@ function Login() {
                 Login:
               </label>
               <Field
-                validate={lenFieldValidator(
+                validate={minLenFieldValidator(
                   3,
                   "The username must be at least 8 characters long"
                 )}
@@ -95,7 +87,7 @@ function Login() {
                 Password:
               </label>
               <Field
-                validate={lenFieldValidator(
+                validate={minLenFieldValidator(
                   8,
                   "The password must be at least 8 characters long"
                 )}
@@ -113,13 +105,13 @@ function Login() {
               <div className="flex mt-5 flex-row w-3/4 md:w-2/5 lg:w-1/8 justify-between items-center">
                 <Link to="/register" className="text-primary-bg hover:underline">Create an account?</Link>
                 <Button.Primary
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || JSON.stringify(errors) !== "{}"}
                   onClick={(e) => handleSubmit()}
                 >
                   Submit
                 </Button.Primary>
               </div>
-              {errors.servererr && <div>{errors.servererr}</div>}
+              {servererr && <div className="text-error-onBg">{servererr}</div>}
             </Form>
           )}
         </Formik>

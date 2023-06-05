@@ -10,7 +10,8 @@ export const login = async (
   const user = await apiMe({ context, setContext }).catch((err) => {
     if (serverErrorHandler && err instanceof Error) serverErrorHandler(err);
   });
-  if (!user && userErrorHandler) return userErrorHandler();
+  if (!user && userErrorHandler) userErrorHandler();
+  if (!user) return;
   if (user) {
     const following = await apiFollows(user?.user.id).catch((err) => {
       if (serverErrorHandler && err instanceof Error) serverErrorHandler(err);
@@ -40,6 +41,49 @@ export const fetchAskerData = async (questions: QuestionWithAnswer[]): Promise<M
   await Promise.all(promises).then(funcs => funcs.forEach(func => func && func()));
 
   return map;
+}
+
+export const fetchAskedData = async (questions: QuestionWithAnswer[]): Promise<Map<number, User>> => {
+  const map = new Map();
+
+  const askedIds = questions 
+    .map(({question}) => question.asked_id)
+    
+  const uniqueAskedIds = Array.from(new Set(askedIds));
+  
+  const promises = uniqueAskedIds.map((id) => {
+    return apiUser(id).then((userData) => {
+      if (!userData) return; //User does not exist for some reason
+
+      return () => { map.set(id, userData); }
+    })
+  });
+
+  await Promise.all(promises).then(funcs => funcs.forEach(func => func && func()));
+
+  return map;
+}
+
+export const minLenFieldValidator = (len: number, err: string): ((value: any) => any) => {
+  return (value) => {
+    if (value && typeof value === "string") {
+      if (value.length < len) {
+        return err;
+      }
+    }
+    return;
+  };
+};
+
+export const maxLenFieldValidator = (len: number, err: string): ((value: any) => any) => {
+  return (value) => {
+    if (value && typeof value === "string") {
+      if (value.length > len) {
+        return err;
+      }
+    }
+    return;
+  };
 }
 
 export function likeResource(questionWithAnswer : QuestionWithAnswer, likeType : Like["like_type"], {context, setContext}: ReturnType<typeof useAppContext>){
