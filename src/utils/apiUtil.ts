@@ -253,3 +253,10 @@ export const like_answer = async(qwa : QuestionWithAnswer, like_or_dislike : boo
         context
     )
 }
+
+export const get_question = async( id: number) => {
+    await fetchApi(
+        `/questions/${id}`,
+        'GET'
+    )
+}
