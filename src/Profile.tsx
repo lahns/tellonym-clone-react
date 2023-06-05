@@ -40,7 +40,10 @@ const Profile = ({ userId }: ProfileProps) => {
   // lil hack to automatically sort questions
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
 
-  const [askerMap, setAskerMap] = useState<Map<number, User>>(new Map());
+  const [askerMap, setAskerMap] = useState<Map<number, User>>(
+    context.currentUser ? new Map([[context.currentUser.user.id, context.currentUser]])
+    : new Map()
+  );
 
   const [sorting, setSorting] = useState<SortingType>("newest");
 
