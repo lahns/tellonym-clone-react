@@ -244,3 +244,12 @@ export const like_question = async(qwa : QuestionWithAnswer, like_or_dislike : b
         context
     )
 }
+
+export const like_answer = async(qwa : QuestionWithAnswer, like_or_dislike : boolean, context: ReturnType<typeof useAppContext>): Promise<void> => {
+    await fetchApi(
+        `/questions/${qwa.question.id}/vote_answer`,
+        "POST",
+        { data: { is_like: like_or_dislike }, __type: "json" } as JSONBody,
+        context
+    )
+}
