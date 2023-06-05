@@ -1,6 +1,6 @@
 import { useAppContext } from "../context";
-import { QuestionWithAnswer, User } from "../types";
-import { apiFollows, apiMe, apiUser } from "./apiUtil";
+import { Like, QuestionWithAnswer, User } from "../types";
+import { apiFollows, apiMe, apiUser, like_answer, like_question } from "./apiUtil";
 
 export const login = async (
   { context, setContext }: ReturnType<typeof useAppContext>,
@@ -40,4 +40,50 @@ export const fetchAskerData = async (questions: QuestionWithAnswer[]): Promise<M
   await Promise.all(promises).then(funcs => funcs.forEach(func => func && func()));
 
   return map;
+}
+
+export function likeResource(questionWithAnswer : QuestionWithAnswer, likeType : Like["like_type"], {context, setContext}: ReturnType<typeof useAppContext>){
+  if (context.currentUser) {
+
+    let like_or_dislike = likeType == "QuestionLike" || likeType == "AnswerLike" ? true : false;
+
+    if(likeType == "QuestionLike" || likeType=="QuestionDislike"){
+      like_question(questionWithAnswer, like_or_dislike, {context, setContext});
+      setContext({
+        ...context,
+        currentUser: {
+          ...context.currentUser,
+          likes: [
+            ...context.currentUser.likes,
+            {
+              like_type: likeType,
+              liker_id: context.currentUser.user.id,
+              resource_id: questionWithAnswer.question.id,
+            },
+          ],
+        },
+      });
+    }
+    else{
+      like_answer(questionWithAnswer, like_or_dislike, {context, setContext});
+      setContext({
+        ...context,
+        currentUser: {
+          ...context.currentUser,
+          likes: [
+            ...context.currentUser.likes,
+            {
+              like_type: likeType,
+              liker_id: context.currentUser.user.id,
+              resource_id: questionWithAnswer.answer!.id,
+            },
+          ],
+        },
+      });
+    }
+    }
+
+      
+         
+  }
 }
