@@ -34,8 +34,6 @@ const Home = () => {
           setqwas(questions_of_following);
           fetchAskerData(questions_of_following).then(map => setAskerMap(map));
         } 
-
-        console.log(qwas);
       }
     })();
   }, [context.currentUser]);

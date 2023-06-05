@@ -30,7 +30,7 @@ type SortingType = keyof typeof sortingOpts;
 
 const Profile = ({ userId }: ProfileProps) => {
   //Needed to refresh the page when url changes
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const { context, setContext } = useAppContext();
 
@@ -216,7 +216,7 @@ const Profile = ({ userId }: ProfileProps) => {
                 <div className="w-fit flex flex-col md:flex-row justify-end items-end">
                   {ownsProfile ? (
                     <Button.Secondary
-                      
+                      onClick={() => setLocation("/settings")}
                     >
                       Edit profile
                     </Button.Secondary>

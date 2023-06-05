@@ -6,6 +6,7 @@ import Login from "./Login";
 import Navbar from "./Navbar";
 import Profile from "./Profile";
 import Register from "./Register";
+import Settings from "./Settings";
 import { AppContext, SessionData } from "./context";
 import { apiRefresh } from "./utils/apiUtil";
 import { login } from "./utils/utils";
@@ -54,6 +55,9 @@ const App = () => {
             </Route>
             <Route path="/register">
               <Register></Register>
+            </Route>
+            <Route path="/settings">
+              <Settings></Settings>
             </Route>
             <Route>404</Route>
           </Switch>
