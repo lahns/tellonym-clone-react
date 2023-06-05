@@ -235,3 +235,21 @@ export const apiFollowers = async (userId: number): Promise<User[] | null> => {
 }
 
 //Add like/dislike api helpers
+
+export const like_question = async(qwa : QuestionWithAnswer, like_or_dislike : boolean, context: ReturnType<typeof useAppContext>): Promise<void> => {
+    await fetchApi(
+        `/questions/${qwa.question.id}/vote_question`,
+        "POST",
+        { data: { is_like: like_or_dislike }, __type: "json" } as JSONBody,
+        context
+    )
+}
+
+export const like_answer = async(qwa : QuestionWithAnswer, like_or_dislike : boolean, context: ReturnType<typeof useAppContext>): Promise<void> => {
+    await fetchApi(
+        `/questions/${qwa.question.id}/vote_answer`,
+        "POST",
+        { data: { is_like: like_or_dislike }, __type: "json" } as JSONBody,
+        context
+    )
+}

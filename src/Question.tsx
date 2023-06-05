@@ -2,6 +2,9 @@ import { Link } from "wouter";
 import { ReactComponent as ThumbsDown } from "./icons/thumbs_down.svg";
 import { ReactComponent as ThumbsUp } from "./icons/thumbs_up.svg";
 import { QuestionWithAnswer, User } from "./types";
+import { like_answer, like_question } from "./utils/apiUtil";
+import { useContext } from "react";
+import { useAppContext } from "./context";
 
 type QuestionProps = {
   questionWithAnswer: QuestionWithAnswer;
@@ -10,6 +13,7 @@ type QuestionProps = {
 
 const Question = ({ questionWithAnswer, asker }: QuestionProps) => {
   const { question, answer } = questionWithAnswer;
+  const context = useAppContext();
 
   return (
     <>
@@ -28,9 +32,9 @@ const Question = ({ questionWithAnswer, asker }: QuestionProps) => {
             <div>{question.content}</div>
           </div>
           <div className="flex flex-col md:flex-col justify-items-center">
-            <ThumbsUp className="scale-5 h-5 fill-white"></ThumbsUp>
+            <ThumbsUp className="scale-5 h-5 fill-white" onClick={() => like_question(questionWithAnswer, true, context)}></ThumbsUp>
             <p className="text-center">{question.likes}</p>
-            <ThumbsDown className="scale-5 h-5 fill-white"></ThumbsDown>
+            <ThumbsDown className="scale-5 h-5 fill-white" onClick={() => like_question(questionWithAnswer, false, context)}></ThumbsDown>
           </div>
         </div>
         <div className="Answer flex flex-row justify-between">
@@ -40,9 +44,9 @@ const Question = ({ questionWithAnswer, asker }: QuestionProps) => {
                 <p className="pl-2">{answer.content}</p>
               </div>
               <div className="flex flex-col md:flex-col justify-items-center">
-                <ThumbsUp className="scale-5 h-5 fill-white"></ThumbsUp>
+                <ThumbsUp className="scale-5 h-5 fill-white" onClick={() => like_answer(questionWithAnswer, true, context)}></ThumbsUp>
                 <p className="text-center">{answer.likes}</p>
-                <ThumbsDown className="scale-5 h-5 fill-white"></ThumbsDown>
+                <ThumbsDown className="scale-5 h-5 fill-white " onClick={() => like_answer(questionWithAnswer, false, context)}></ThumbsDown>
               </div>
             </>
           ) : null}
