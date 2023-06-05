@@ -285,7 +285,7 @@ const Settings = () => {
                             disabled={isSubmitting || JSON.stringify(errors) !== "{}"}
                             onClick={(e) => handleSubmit()}
                             >
-                            Submit
+                            Save
                         </Button.Primary>
                     </div>
                     {servererr && (

@@ -3,13 +3,14 @@ import Question from "./Question";
 import { useAppContext } from "./context";
 import { QuestionWithAnswer, User } from "./types";
 import { apiGetUserQuestions } from "./utils/apiUtil";
-import { fetchAskerData } from "./utils/utils";
+import { fetchAskedData, fetchAskerData } from "./utils/utils";
 
 const Home = () => {
   const [qwas, setqwas] = useState<QuestionWithAnswer[] | null>(null);
   const { context } = useAppContext();
 
   const [askerMap, setAskerMap] = useState<Map<number, User>>(new Map())
+  const [askedMap, setAskedMap] = useState<Map<number, User>>(new Map())
 
   
 
@@ -34,13 +35,14 @@ const Home = () => {
         if (qwas === null) {
           setqwas(questions_of_following);
           fetchAskerData(questions_of_following).then(map => setAskerMap(map));
+          fetchAskedData(questions_of_following).then(map => setAskedMap(map));
         } 
       }
     })();
   }, [context.currentUser]);
 
   return (
-    <div className="w-full rounded-lg overflow-hidden">
+    <div className="w-full rounded-lg overflow-hidden divide-y-2 divide-gray-outline rounded-lg">
                 {
                   qwas?.length === 0 ?
                     <div className="text-gray-outline text-3xl font-bold text-center">
@@ -56,6 +58,17 @@ const Home = () => {
                           ? askerMap.get(qwa.question.asker_id) ?? null
                           : null
                       }
+                      asked={
+                        //kms
+                        askedMap.get(qwa.question.asked_id) ?? { username: "Deleted user", bio: "", id: -1, follower_count: 0, following_count: 0, instagram: "", twitch: "", twitter: "", youtube: ""}
+                      }
+                      // no answering questions on homepage
+                      selected={false}
+                      setSelected={() => {}}
+                      position={
+                        index == 0 ? 'first' : (index == qwas.length-1 ? 'last' : null)
+                      }
+                      showAsked={true}
                     />
                   ))
                 }
