@@ -10,7 +10,8 @@ export const login = async (
   const user = await apiMe({ context, setContext }).catch((err) => {
     if (serverErrorHandler && err instanceof Error) serverErrorHandler(err);
   });
-  if (!user && userErrorHandler) return userErrorHandler();
+  if (!user && userErrorHandler) userErrorHandler();
+  if (!user) return;
   if (user) {
     const following = await apiFollows(user?.user.id).catch((err) => {
       if (serverErrorHandler && err instanceof Error) serverErrorHandler(err);
@@ -41,3 +42,25 @@ export const fetchAskerData = async (questions: QuestionWithAnswer[]): Promise<M
 
   return map;
 }
+
+export const minLenFieldValidator = (len: number, err: string): ((value: any) => any) => {
+  return (value) => {
+    if (value && typeof value === "string") {
+      if (value.length < len) {
+        return err;
+      }
+    }
+    return;
+  };
+};
+
+export const maxLenFieldValidator = (len: number, err: string): ((value: any) => any) => {
+  return (value) => {
+    if (value && typeof value === "string") {
+      if (value.length > len) {
+        return err;
+      }
+    }
+    return;
+  };
+};

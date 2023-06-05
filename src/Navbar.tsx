@@ -93,7 +93,8 @@ const SearchBar = ({ userId, context, setContext }: { userId: number | undefined
             // no results
             return;
           } else {
-            setUsers(results);
+            const filteredResults = context.currentUser ? results.filter((user) => user.id !== context.currentUser!.user.id) : results;
+            setUsers(filteredResults);
           }
           setIsLoading(false);
         })

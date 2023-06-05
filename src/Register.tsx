@@ -1,38 +1,32 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import Button from "./Button";
 import { useAppContext } from "./context";
 import { ReactComponent as AskletIcon } from "./icons/asklet2.svg";
 import { apiRegisterUser } from "./utils/apiUtil";
-import { login } from "./utils/utils";
+import { login, minLenFieldValidator } from "./utils/utils";
 
-const lenFieldValidator = (len: number, err: string): ((value: any) => any) => {
-  return (value) => {
-    if (value && typeof value === "string") {
-      if (value.length < len) {
-        return err;
-      }
-    }
-    return;
-  };
-};
 
 type Values = {
   login: string;
   password: string;
   repeated_password: string;
-  servererr?: string;
 };
 
 function Register() {
   const { context, setContext } = useAppContext();
   const [, setLocation] = useLocation();
 
+
+  const [ servererr, setServerErr ] = useState<string | null>(null);
+
+
   const submitRegister = (
     { login: username, password, repeated_password }: Values,
     { setSubmitting, setErrors }: FormikHelpers<Values>
   ) => {
+    setServerErr(null);
     if (password === repeated_password) {
       apiRegisterUser({ username, password }).then((token) => {
         login(
@@ -41,16 +35,15 @@ function Register() {
             setContext,
           },
           () =>
-            setErrors({
-              servererr:
-                "Your account was created, but we failed to fetch your data. Go to login page to log in.",
-            }),
-          (err: Error) => setErrors({ servererr: err.message })
+          setServerErr(
+                "Your account was created, but we failed to fetch your data. Go to the login page to log in.",
+          ),
+          (err: Error) => setServerErr(err.message)
         ).then(() => setLocation("/"));
       });
       setSubmitting(false);
     } else {
-      setErrors({ servererr: "Passwords don't match" });
+      setServerErr("Passwords don't match");
     }
   };
 
@@ -88,7 +81,7 @@ function Register() {
                 Login:
               </label>
               <Field
-                validate={lenFieldValidator(
+                validate={minLenFieldValidator(
                   3,
                   "The username must be at least 8 characters long"
                 )}
@@ -107,7 +100,7 @@ function Register() {
                 Password:
               </label>
               <Field
-                validate={lenFieldValidator(
+                validate={minLenFieldValidator(
                   8,
                   "The password must be at least 8 characters long"
                 )}
@@ -126,7 +119,7 @@ function Register() {
                 Confirm password:
               </label>
               <Field
-                validate={lenFieldValidator(
+                validate={minLenFieldValidator(
                   8,
                   "The password must be at least 8 characters long"
                 )}
@@ -148,14 +141,14 @@ function Register() {
               <div className="flex mt-5 flex-row w-3/4 md:w-2/5 lg:w-1/8 justify-between items-center">
                 <Link to="/login" className="text-primary-bg hover:underline">Log in?</Link>
                 <Button.Primary
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || JSON.stringify(errors) !== "{}"}
                   onClick={(e) => handleSubmit()}
                 >
                   Submit
                 </Button.Primary>
               </div>
-              {errors.servererr && (
-                <div className="text-error-onBg">{errors.servererr}</div>
+              {servererr && (
+                <div className="text-error-onBg">{servererr}</div>
               )}
             </Form>
           )}
