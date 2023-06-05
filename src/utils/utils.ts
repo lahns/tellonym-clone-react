@@ -1,6 +1,6 @@
 import { useAppContext } from "../context";
-import { QuestionWithAnswer, User } from "../types";
-import { apiFollows, apiMe, apiUser } from "./apiUtil";
+import { Like, QuestionWithAnswer, User } from "../types";
+import { apiFollows, apiMe, apiUser, like_answer, like_question } from "./apiUtil";
 
 export const login = async (
   { context, setContext }: ReturnType<typeof useAppContext>,
@@ -43,6 +43,27 @@ export const fetchAskerData = async (questions: QuestionWithAnswer[]): Promise<M
   return map;
 }
 
+export const fetchAskedData = async (questions: QuestionWithAnswer[]): Promise<Map<number, User>> => {
+  const map = new Map();
+
+  const askedIds = questions 
+    .map(({question}) => question.asked_id)
+    
+  const uniqueAskedIds = Array.from(new Set(askedIds));
+  
+  const promises = uniqueAskedIds.map((id) => {
+    return apiUser(id).then((userData) => {
+      if (!userData) return; //User does not exist for some reason
+
+      return () => { map.set(id, userData); }
+    })
+  });
+
+  await Promise.all(promises).then(funcs => funcs.forEach(func => func && func()));
+
+  return map;
+}
+
 export const minLenFieldValidator = (len: number, err: string): ((value: any) => any) => {
   return (value) => {
     if (value && typeof value === "string") {
@@ -63,4 +84,49 @@ export const maxLenFieldValidator = (len: number, err: string): ((value: any) =>
     }
     return;
   };
-};
+}
+
+export function likeResource(questionWithAnswer : QuestionWithAnswer, likeType : Like["like_type"], {context, setContext}: ReturnType<typeof useAppContext>){
+  if (context.currentUser) {
+
+    let like_or_dislike = likeType == "QuestionLike" || likeType == "AnswerLike" ? true : false;
+
+    if(likeType == "QuestionLike" || likeType=="QuestionDislike"){
+      like_question(questionWithAnswer, like_or_dislike, {context, setContext});
+      setContext({
+        ...context,
+        currentUser: {
+          ...context.currentUser,
+          likes: [
+            ...context.currentUser.likes,
+            {
+              like_type: likeType,
+              liker_id: context.currentUser.user.id,
+              resource_id: questionWithAnswer.question.id,
+            },
+          ],
+        },
+      });
+    }
+    else{
+      like_answer(questionWithAnswer, like_or_dislike, {context, setContext});
+      setContext({
+        ...context,
+        currentUser: {
+          ...context.currentUser,
+          likes: [
+            ...context.currentUser.likes,
+            {
+              like_type: likeType,
+              liker_id: context.currentUser.user.id,
+              resource_id: questionWithAnswer.answer!.id,
+            },
+          ],
+        },
+      });
+    }
+  }
+
+      
+          
+} 
