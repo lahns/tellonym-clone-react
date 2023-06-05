@@ -254,9 +254,15 @@ export const like_answer = async(qwa : QuestionWithAnswer, like_or_dislike : boo
     )
 }
 
-export const get_question = async( id: number) => {
-    await fetchApi(
+export const get_question = async( id: number): Promise<QuestionWithAnswer | null> => {
+    return await fetchApi(
         `/questions/${id}`,
         'GET'
-    )
+    ).then(res => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            return null;
+        }
+    }) as QuestionWithAnswer | null;
 }
