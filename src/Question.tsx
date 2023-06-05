@@ -18,9 +18,6 @@ const Question = ({ questionWithAnswer, asker}: QuestionProps) => {
 
   const [likeCount, setLike] = useState(question.likes);
 
-  useEffect(() =>{
-    
-})
 
   return (
     <>
