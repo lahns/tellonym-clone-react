@@ -40,13 +40,16 @@ const Profile = ({ userId }: ProfileProps) => {
   // lil hack to automatically sort questions
   const [questions, setQuestions] = useState<QuestionWithAnswer[]>([]);
 
-  const [askedMap, setAskedMap] = useState<Map<number, User>>(new Map())
+  const [askedMap, setAskedMap] = useState<Map<number, User>>(new Map());
   const [askerMap, setAskerMap] = useState<Map<number, User>>(
-    context.currentUser ? new Map([[context.currentUser.user.id, context.currentUser]])
-    : new Map()
+    context.currentUser
+      ? new Map([[context.currentUser.user.id, context.currentUser]])
+      : new Map()
   );
 
-  const [currentlySelectedQuestion, setCurrentlySelectedQuestion] = useState<number | null>(null);
+  const [currentlySelectedQuestion, setCurrentlySelectedQuestion] = useState<
+    number | null
+  >(null);
 
   const [sorting, setSorting] = useState<SortingType>("newest");
 
@@ -78,7 +81,7 @@ const Profile = ({ userId }: ProfileProps) => {
   };
 
   useEffect(() => {
-    setQuestions(oldQuestions => sortQuestions(oldQuestions, sorting));
+    setQuestions((oldQuestions) => sortQuestions(oldQuestions, sorting));
   }, [sorting]);
 
   const sampleQuestions: string[] = [
@@ -90,7 +93,7 @@ const Profile = ({ userId }: ProfileProps) => {
     "What are your pronouns?",
     "Will you play a game with me?",
     "What is your favourite sport?",
-    "What is melon going to be smelling today?"
+    "What is melon going to be smelling today?",
   ];
 
   const [randomSampleQuestion] = useState(
@@ -99,12 +102,11 @@ const Profile = ({ userId }: ProfileProps) => {
 
   const ownsProfile = context.currentUser?.user.id === userId;
 
-
   useEffect(() => {
     setUserData(null);
     setUserExists(true);
     window.scrollTo(0, 0);
-    
+
     // Fetch user data for the profile owner
     apiUser(userId).then((data) => {
       if (!data) {
@@ -115,12 +117,12 @@ const Profile = ({ userId }: ProfileProps) => {
         document.title = `${data.username}'s profile`;
       }
     });
-    
+
     apiGetUserQuestions(userId).then((data) => {
       if (!data) return;
 
-      fetchAskerData(data).then(map => setAskerMap(map))
-      fetchAskedData(data).then(map => setAskedMap(map));
+      fetchAskerData(data).then((map) => setAskerMap(map));
+      fetchAskedData(data).then((map) => setAskedMap(map));
 
       const sortedQuestions = sortQuestions(data, "newest");
       setQuestions(sortedQuestions);
@@ -152,6 +154,8 @@ const Profile = ({ userId }: ProfileProps) => {
   const anonCheckbox = useRef<HTMLInputElement>(null);
   const questionBox = useRef<HTMLTextAreaElement>(null);
 
+
+  
   const askQuestion = () => {
     if (
       context.currentUser &&
@@ -219,12 +223,10 @@ const Profile = ({ userId }: ProfileProps) => {
                 </div>
                 <div className="w-fit flex flex-col md:flex-row justify-end items-end">
                   {ownsProfile ? (
-                    <Button.Secondary
-                      onClick={() => setLocation("/settings")}
-                    >
+                    <Button.Secondary onClick={() => setLocation("/settings")}>
                       Edit profile
                     </Button.Secondary>
-                  ) : context.following?.some(({id}) => userId === id) ? (
+                  ) : context.following?.some(({ id }) => userId === id) ? (
                     <Button.Cancel onClick={unfollowUser}>
                       Unfollow
                     </Button.Cancel>
@@ -242,34 +244,30 @@ const Profile = ({ userId }: ProfileProps) => {
               </div>
             </div>
             <div className="w-full md:w-3/4 flex flex-row gap-4 justify-start items-center px-4 pb-4">
-              { userData.youtube ? 
-                <Badge.Youtube 
+              {userData.youtube ? (
+                <Badge.Youtube
                   label={`@${userData.youtube}`}
                   link={`https://youtube.com/@${userData.youtube}`}
                 />
-                : null
-              }
-              { userData.twitter ? 
-              <Badge.Twitter 
-                label={`@${userData.twitter}`}
-                link={`https://twitter.com/${userData.twitter}`}
-              />
-                : null
-              }
-              { userData.instagram ? 
-              <Badge.Instagram
-                label={userData.instagram}
-                link={`https://instagram.com/${userData.instagram}`}
-              />
-                : null
-              }
-              { userData.twitch ? 
-              <Badge.Twitch 
-                label={userData.twitch}
-                link={`https://twitch.com/${userData.twitch}`}
-              />
-                : null
-              }
+              ) : null}
+              {userData.twitter ? (
+                <Badge.Twitter
+                  label={`@${userData.twitter}`}
+                  link={`https://twitter.com/${userData.twitter}`}
+                />
+              ) : null}
+              {userData.instagram ? (
+                <Badge.Instagram
+                  label={userData.instagram}
+                  link={`https://instagram.com/${userData.instagram}`}
+                />
+              ) : null}
+              {userData.twitch ? (
+                <Badge.Twitch
+                  label={userData.twitch}
+                  link={`https://twitch.com/${userData.twitch}`}
+                />
+              ) : null}
             </div>
             <div className="w-full flex flex-row justify-evenly items-start p-4">
               <div className="flex flex-col justify-center items-center">
@@ -286,7 +284,7 @@ const Profile = ({ userId }: ProfileProps) => {
               </div>
               <div className="flex flex-col justify-center items-center">
                 <div className="text-text-header font-bold text-3xl">
-                  { questions.length }
+                  {questions.length}
                 </div>
                 <div className="font-thin text-text-secondary">Questions</div>
               </div>
@@ -324,12 +322,11 @@ const Profile = ({ userId }: ProfileProps) => {
                 ></Select>
               </div>
               <div className="w-full rounded-md overflow-hidden  divide-y-2 divide-gray-outline">
-                {
-                  questions.length === 0 ?
-                    <div className="text-gray-outline text-3xl font-bold text-center">
-                      No questions yet
-                    </div>
-                  :
+                {questions.length === 0 ? (
+                  <div className="text-gray-outline text-3xl font-bold text-center">
+                    No questions yet
+                  </div>
+                ) : (
                   questions.map((qwa, index) => (
                     <Question
                       key={index}
@@ -341,17 +338,44 @@ const Profile = ({ userId }: ProfileProps) => {
                       }
                       asked={
                         //kms
-                        askedMap.get(qwa.question.asked_id) ?? { username: "Deleted user", bio: "", id: -1, follower_count: 0, following_count: 0, instagram: "", twitch: "", twitter: "", youtube: ""}
+                        askedMap.get(qwa.question.asked_id) ?? {
+                          username: "Deleted user",
+                          bio: "",
+                          id: -1,
+                          follower_count: 0,
+                          following_count: 0,
+                          instagram: "",
+                          twitch: "",
+                          twitter: "",
+                          youtube: "",
+                        }
                       }
-                      setSelected={() => currentlySelectedQuestion === index ? setCurrentlySelectedQuestion(null) : setCurrentlySelectedQuestion(index) }
+                      setSelected={() =>
+                        currentlySelectedQuestion === index
+                          ? setCurrentlySelectedQuestion(null)
+                          : setCurrentlySelectedQuestion(index)
+                      }
                       selected={currentlySelectedQuestion == index}
                       position={
-                        index == 0 ? 'first' : (index == questions.length-1 ? 'last' : null)
+                        index == 0
+                          ? "first"
+                          : index == questions.length - 1
+                          ? "last"
+                          : null
                       }
                       showAsked={false}
+                      setQuestion={(func: (qwa: QuestionWithAnswer) => QuestionWithAnswer) => {
+                        setQuestions((old) =>
+                            sortQuestions([
+                              ...old!.filter((qwa2) => qwa2.question.id !== qwa.question.id), 
+                              ...old!.filter((qwa2) => qwa2.question.id === qwa.question.id).map((qwa) => func(qwa))
+                            ], sorting)
+                          )
+                        }
+                      }
                     />
                   ))
-                }
+                )}
               </div>
             </div>
           </>

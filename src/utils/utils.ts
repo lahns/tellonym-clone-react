@@ -120,8 +120,8 @@ export function likeResource(questionWithAnswer : QuestionWithAnswer, likeType :
       like_answer(questionWithAnswer, like_or_dislike, {context, setContext});
 
       let Likes = context.currentUser.likes;
-      let answer_likes = Likes.filter(like => like.like_type == "QuestionLike" || like.like_type =="QuestionDislike");
-      let question_likes = Likes.filter(like => like.resource_id != questionWithAnswer.answer!.id && (like.like_type == "AnswerLike" || like.like_type == "AnswerDislike"));
+      let question_likes = Likes.filter(like => like.like_type == "QuestionLike" || like.like_type =="QuestionDislike");
+      let answer_likes = Likes.filter(like => like.resource_id != questionWithAnswer.answer!.id && (like.like_type == "AnswerLike" || like.like_type == "AnswerDislike"));
 
       let new_likes = [...answer_likes, ...question_likes]
 

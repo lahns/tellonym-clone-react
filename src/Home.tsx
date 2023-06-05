@@ -12,7 +12,24 @@ const Home = () => {
   const [askerMap, setAskerMap] = useState<Map<number, User>>(new Map())
   const [askedMap, setAskedMap] = useState<Map<number, User>>(new Map())
 
-  
+  const sortQuestions = (
+    questions: QuestionWithAnswer[],
+  ): QuestionWithAnswer[] => {
+    const sorted = questions.sort(
+      (
+        { question: { likes: likes1, asked_at: asked_at1 } },
+        { question: { likes: likes2, asked_at: asked_at2 } }
+      ) => {
+          const date1 = Date.parse(asked_at1);
+          const date2 = Date.parse(asked_at2);
+
+          return date1 - date2;
+      }
+    );
+
+    return sorted;
+  };
+
 
   useEffect(() => {
     document.title = "Home";
@@ -33,7 +50,7 @@ const Home = () => {
         }
 
         if (qwas === null) {
-          setqwas(questions_of_following);
+          setqwas(sortQuestions(questions_of_following));
           fetchAskerData(questions_of_following).then(map => setAskerMap(map));
           fetchAskedData(questions_of_following).then(map => setAskedMap(map));
         } 
@@ -42,7 +59,7 @@ const Home = () => {
   }, [context.currentUser]);
 
   return (
-    <div className="w-full rounded-lg overflow-hidden divide-y-2 divide-gray-outline rounded-lg">
+    <div className="w-full overflow-hidden divide-y-2 divide-gray-outline rounded-lg">
                 {
                   qwas?.length === 0 ?
                     <div className="text-gray-outline text-3xl font-bold text-center">
@@ -69,6 +86,15 @@ const Home = () => {
                         index == 0 ? 'first' : (index == qwas.length-1 ? 'last' : null)
                       }
                       showAsked={true}
+                      setQuestion={(func: (qwa: QuestionWithAnswer) => QuestionWithAnswer) => {
+                        setqwas((old) =>
+                            sortQuestions([
+                              ...old!.filter((qwa2) => qwa2.question.id !== qwa.question.id), 
+                              ...old!.filter((qwa2) => qwa2.question.id === qwa.question.id).map((qwa) => func(qwa))
+                            ])
+                          )
+                        }
+                      }
                     />
                   ))
                 }

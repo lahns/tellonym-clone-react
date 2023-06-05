@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Link } from "wouter";
 import Button from "./Button";
 import Textarea from "./Textarea";
@@ -18,6 +18,7 @@ type QuestionProps = {
   selected: boolean;
   position: "first" | "last" | null;
   showAsked: boolean;
+  setQuestion: (func: (qwa: QuestionWithAnswer) => QuestionWithAnswer) => void;
 };
 
 const Question = ({
@@ -28,22 +29,51 @@ const Question = ({
   position,
   showAsked,
   asked,
+  setQuestion,
 }: QuestionProps) => {
   const { question, answer } = questionWithAnswer;
   const context = useAppContext();
 
-  const [likeCount, setLike] = useState(question.likes);
-
   const isLoggedIn = context.context.currentUser ? true : false;
 
   const answer_ref = useRef<HTMLTextAreaElement>(null);
+
+  const questionIsLiked = context.context.currentUser?.likes.find(
+    (like) =>
+      like.resource_id == question.id && like.like_type == "QuestionLike"
+  );
+  const questionIsDisliked = context.context.currentUser?.likes.find(
+    (like) =>
+      like.resource_id == question.id && like.like_type == "QuestionDislike"
+  );
+  const answerIsLiked = context.context.currentUser?.likes.find(
+    (like) => like.resource_id == answer?.id && like.like_type == "AnswerLike"
+  );
+  const answerIsDisliked = context.context.currentUser?.likes.find(
+    (like) =>
+      like.resource_id == answer?.id && like.like_type == "AnswerDislike"
+  );
 
   const answerQuestion = () => {
     apiAnswerQuestion(
       question.id,
       { content: answer_ref.current!.value },
       context
-    ).then(() => setSelected());
+    ).then(() => {
+      //id should be returned from api call
+      setQuestion((qwa) => {
+        qwa.answer = {
+          question_id: qwa.question.id,
+          id: -1,
+          answered_at: new Date(Date.now()).toISOString(),
+          last_edit_at: new Date(Date.now()).toISOString(),
+          likes: 0,
+          content: answer_ref.current!.value,
+        };
+        return qwa;
+      });
+      setSelected();
+    });
   };
 
   return (
@@ -99,38 +129,88 @@ const Question = ({
           </div>
           <div className="flex flex-col md:flex-col justify-items-center">
             <ThumbsUp
-              className="scale-5 h-5 fill-slate-200 hover:white"
-              onClick={() => [likeResource(questionWithAnswer, "QuestionLike", context),get_question(question.id)
-              .then(res => setLike(res?.question.likes!)) ]}
+              className={`scale-5 h-5 fill-text-header rounded-full ${
+                questionIsLiked && "bg-primary-light"
+              }`}
+              onClick={() => {
+                likeResource(questionWithAnswer, "QuestionLike", context);
+                get_question(question.id).then((res) =>
+                  setQuestion((self) => {
+                    self.question.likes = res?.question.likes!;
+                    return self;
+                  })
+                );
+              }}
             ></ThumbsUp>
-            <p className="text-center">{likeCount}</p>
+            <p className="text-center">{question.likes}</p>
             <ThumbsDown
-              className="scale-5 h-5 fill-slate-200"
-              onClick={() => [likeResource(questionWithAnswer, "QuestionDislike", context),get_question(question.id)
-              .then(res => setLike(res?.question.likes!)) ]}
+              className={`scale-5 h-5 fill-text-header rounded-full ${
+                questionIsDisliked && "bg-primary-light"
+              }`}
+              onClick={() => {
+                likeResource(questionWithAnswer, "QuestionDislike", context);
+                get_question(question.id).then((res) =>
+                  setQuestion((self) => {
+                    self.question.likes = res?.question.likes!;
+                    return self;
+                  })
+                );
+              }}
             ></ThumbsDown>
           </div>
         </div>
         <div className="Answer flex flex-col gap-2 pt-4">
           {answer ? (
             <>
-              <div className="Answer border-l-2">
-                <p className="pl-2">{answer.content}</p>
+              <div className="flex flex-row gap-2 items-center">
+                <p className="font-thin text-base text-gray-onBg">
+                  Answer from {asked.username}
+                </p>
+                {answer.last_edit_at !== answer.answered_at ? (
+                  <p className="font-thin text-sm text-gray-onBg">
+                    (Edited on {answer.last_edit_at})
+                  </p>
+                ) : null}
               </div>
-              <div className="flex flex-col md:flex-col justify-items-center">
-                <ThumbsUp
-                  className="scale-5 h-5 fill-white"
-                  onClick={() => [likeResource(questionWithAnswer, "AnswerLike", context), get_question(question.id)
-                  .then(res => setLike(res?.question.likes!)) ]}
-                ></ThumbsUp>
-                <p className="text-center">{answer.likes}</p>
-                <ThumbsDown
-                  className="scale-5 h-5 fill-white "
-                  onClick={() =>
-                    [likeResource(questionWithAnswer, "AnswerDislike", context), get_question(question.id)
-                    .then(res => setLike(res?.question.likes!)) ]
-                  }
-                ></ThumbsDown>
+              <div className="flex flex-row gap-2 justify-between">
+                <div className="Answer border-l-2">
+                  <p className="pl-2">{answer.content}</p>
+                </div>
+                <div className="flex flex-col md:flex-col justify-items-center">
+                  <ThumbsUp
+                    className={`scale-5 h-5 fill-text-header rounded-full ${
+                      answerIsLiked && "bg-primary-light"
+                    }`}
+                    onClick={() => {
+                      likeResource(questionWithAnswer, "AnswerLike", context);
+                      get_question(question.id).then((res) =>
+                        setQuestion((self) => {
+                          self.answer!.likes = res?.answer?.likes!;
+                          return self;
+                        })
+                      );
+                    }}
+                  ></ThumbsUp>
+                  <p className="text-center">{answer.likes}</p>
+                  <ThumbsDown
+                    className={`scale-5 h-5 fill-text-header rounded-full ${
+                      answerIsDisliked && "bg-primary-light"
+                    }`}
+                    onClick={() => {
+                      likeResource(
+                        questionWithAnswer,
+                        "AnswerDislike",
+                        context
+                      );
+                      get_question(question.id).then((res) =>
+                        setQuestion((self) => {
+                          self.answer!.likes = res?.answer?.likes!;
+                          return self;
+                        })
+                      );
+                    }}
+                  ></ThumbsDown>
+                </div>
               </div>
             </>
           ) : null}
@@ -151,7 +231,7 @@ const Question = ({
             ) : (
               <div className="w-full flex flex-row py-2">
                 <Button.Secondary onClick={() => setSelected()}>
-                  Answer
+                  {answer ? "Edit answer" : "Answer"}
                 </Button.Secondary>
               </div>
             )
